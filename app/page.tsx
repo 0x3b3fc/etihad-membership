@@ -110,7 +110,7 @@ export default function HomePage() {
       <footer className="border-t bg-white py-4 sm:py-6">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs sm:text-sm text-gray-500">
-            جميع الحقوق محفوظة © اتحاد بشبابها {new Date().getFullYear()}
+            جميع الحقوق محفوظة © اتحاد بشبابها 2026 - وحدة الربط المركزي (المركز التقني)
           </p>
         </div>
       </footer>

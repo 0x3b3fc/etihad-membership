@@ -66,7 +66,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
         <div className="container mx-auto px-4 py-6">
           <div className="text-center">
             <p className="text-sm text-gray-500">
-              جميع الحقوق محفوظة - اتحاد بشبابها {new Date().getFullYear()}
+              جميع الحقوق محفوظة © اتحاد بشبابها 2026 - وحدة الربط المركزي (المركز التقني)
             </p>
           </div>
         </div>
