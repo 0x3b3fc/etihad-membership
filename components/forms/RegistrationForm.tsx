@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { memberSchema, type MemberFormData } from "@/lib/validations/member";
+import { baseMemberSchema, type MemberFormData } from "@/lib/validations/member";
 import { governorates } from "@/lib/data/governorates";
 import { entities, memberTypes, paymentInfo } from "@/lib/data/entities";
 import Input from "@/components/ui/Input";
@@ -30,7 +30,7 @@ export default function RegistrationForm() {
     setValue,
     formState: { errors },
   } = useForm<MemberFormData>({
-    resolver: zodResolver(memberSchema),
+    resolver: zodResolver(baseMemberSchema),
     defaultValues: {
       paymentMethod: undefined,
       memberType: undefined,
@@ -78,6 +78,7 @@ export default function RegistrationForm() {
       if (data.instapayRef) {
         formData.append("instapayRef", data.instapayRef);
       }
+      formData.append("amountPaid", data.amountPaid.toString());
 
       const response = await fetch("/api/register", {
         method: "POST",
@@ -250,6 +251,18 @@ export default function RegistrationForm() {
           {...register("instapayRef")}
         />
       )}
+
+      {/* Amount Paid */}
+      <Input
+        label="المبلغ المدفوع"
+        placeholder="أدخل المبلغ المدفوع"
+        type="number"
+        error={errors.amountPaid?.message}
+        required
+        dir="ltr"
+        className="text-left"
+        {...register("amountPaid")}
+      />
 
       {/* Payment Receipt */}
       <FileUpload

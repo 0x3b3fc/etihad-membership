@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     const paymentMethod = formData.get("paymentMethod") as string;
     const coordinatorName = formData.get("coordinatorName") as string | null;
     const instapayRef = formData.get("instapayRef") as string | null;
+    const amountPaid = formData.get("amountPaid") as string;
     const profileImageFile = formData.get("profileImage") as File | null;
     const paymentReceiptFile = formData.get("paymentReceipt") as File | null;
 
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
       paymentMethod,
       coordinatorName: coordinatorName || undefined,
       instapayRef: instapayRef || undefined,
+      amountPaid,
     });
 
     if (!validationResult.success) {
@@ -175,6 +177,7 @@ export async function POST(request: NextRequest) {
         paymentMethod: validationResult.data.paymentMethod,
         coordinatorName: validationResult.data.coordinatorName || null,
         instapayRef: validationResult.data.instapayRef || null,
+        amountPaid: parseFloat(validationResult.data.amountPaid),
         paymentReceipt: paymentReceiptUrl,
         qrCode: "", // Will be updated after creation
       },
