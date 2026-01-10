@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { governorates } from "@/lib/data/governorates";
+import { entities, memberTypes, paymentInfo } from "@/lib/data/entities";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -22,8 +23,7 @@ export default function AddMemberPage() {
     fullNameAr: "",
     fullNameEn: "",
     governorate: "",
-    entityType: "" as "unit" | "committee" | "",
-    entityLevel: "" as "central" | "governorate" | "",
+    memberType: "" as "student" | "graduate" | "",
     entityName: "",
     role: "",
     paymentMethod: "" as "coordinator" | "instapay" | "",
@@ -41,7 +41,7 @@ export default function AddMemberPage() {
       return;
     }
 
-    if (!formData.entityType || !formData.entityLevel || !formData.paymentMethod) {
+    if (!formData.memberType || !formData.entityName || !formData.paymentMethod) {
       setError("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
@@ -54,11 +54,8 @@ export default function AddMemberPage() {
       submitData.append("fullNameAr", formData.fullNameAr);
       submitData.append("fullNameEn", formData.fullNameEn);
       submitData.append("governorate", formData.governorate);
-      submitData.append("entityType", formData.entityType);
-      submitData.append("entityLevel", formData.entityLevel);
-      if (formData.entityName) {
-        submitData.append("entityName", formData.entityName);
-      }
+      submitData.append("memberType", formData.memberType);
+      submitData.append("entityName", formData.entityName);
       submitData.append("role", formData.role);
       submitData.append("paymentMethod", formData.paymentMethod);
       submitData.append("profileImage", profileImage);
@@ -100,15 +97,15 @@ export default function AddMemberPage() {
     label: gov,
   }));
 
-  const entityTypeOptions = [
-    { value: "unit", label: "وحدة" },
-    { value: "committee", label: "لجنة" },
-  ];
+  const memberTypeOptions = memberTypes.map((type) => ({
+    value: type.value,
+    label: type.label,
+  }));
 
-  const entityLevelOptions = [
-    { value: "central", label: "مركزي (على مستوى الجمهورية)" },
-    { value: "governorate", label: "محافظة" },
-  ];
+  const entityOptions = entities.map((entity) => ({
+    value: entity,
+    label: entity,
+  }));
 
   const paymentOptions = [
     { value: "coordinator", label: "منسق المحافظة" },
@@ -182,31 +179,23 @@ export default function AddMemberPage() {
             required
           />
 
-          {/* Entity Type & Level */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <RadioGroup
-              label="نوع الكيان"
-              options={entityTypeOptions}
-              value={formData.entityType}
-              onValueChange={(value) => setFormData({ ...formData, entityType: value as "unit" | "committee" })}
-              required
-            />
-
-            <RadioGroup
-              label="المستوى"
-              options={entityLevelOptions}
-              value={formData.entityLevel}
-              onValueChange={(value) => setFormData({ ...formData, entityLevel: value as "central" | "governorate" })}
-              required
-            />
-          </div>
+          {/* Member Type */}
+          <RadioGroup
+            label="نوع العضو"
+            options={memberTypeOptions}
+            value={formData.memberType}
+            onValueChange={(value) => setFormData({ ...formData, memberType: value as "student" | "graduate" })}
+            required
+          />
 
           {/* Entity Name */}
-          <Input
-            label={formData.entityType === "committee" ? "اسم اللجنة" : "اسم الوحدة"}
-            placeholder={formData.entityType === "committee" ? "مثال: لجنة الشباب" : "مثال: وحدة التدريب"}
+          <Select
+            label="الوحدة / اللجنة"
+            options={entityOptions}
+            placeholder="اختر الوحدة أو اللجنة"
             value={formData.entityName}
             onChange={(e) => setFormData({ ...formData, entityName: e.target.value })}
+            required
           />
 
           {/* Role */}

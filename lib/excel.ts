@@ -7,9 +7,8 @@ interface ExcelMember {
   "الاسم بالعربية": string;
   "الاسم بالإنجليزية": string;
   "المحافظة": string;
-  "نوع الكيان": string;
-  "المستوى": string;
-  "اسم الكيان": string;
+  "نوع العضو": string;
+  "الوحدة/اللجنة": string;
   "الصفة": string;
   "طريقة الدفع": string;
   "اسم المنسق": string;
@@ -26,9 +25,8 @@ export function generateExcel(members: Member[]): Buffer {
     "الاسم بالعربية": member.fullNameAr,
     "الاسم بالإنجليزية": member.fullNameEn,
     "المحافظة": member.governorate,
-    "نوع الكيان": member.entityType === "unit" ? "وحدة" : "لجنة",
-    "المستوى": member.entityLevel === "central" ? "مركزي" : "محافظة",
-    "اسم الكيان": member.entityName || "-",
+    "نوع العضو": member.memberType === "student" ? "طالب" : "خريج",
+    "الوحدة/اللجنة": member.entityName,
     "الصفة": member.role,
     "طريقة الدفع": member.paymentMethod === "coordinator" ? "منسق المحافظة" : "Instapay",
     "اسم المنسق": member.coordinatorName || "-",
@@ -49,9 +47,8 @@ export function generateExcel(members: Member[]): Buffer {
       "الاسم بالعربية",
       "الاسم بالإنجليزية",
       "المحافظة",
-      "نوع الكيان",
-      "المستوى",
-      "اسم الكيان",
+      "نوع العضو",
+      "الوحدة/اللجنة",
       "الصفة",
       "طريقة الدفع",
       "اسم المنسق",
@@ -72,9 +69,8 @@ export function generateExcel(members: Member[]): Buffer {
     { wch: 30 }, // الاسم بالعربية
     { wch: 30 }, // الاسم بالإنجليزية
     { wch: 15 }, // المحافظة
-    { wch: 10 }, // نوع الكيان
-    { wch: 10 }, // المستوى
-    { wch: 20 }, // اسم الكيان
+    { wch: 10 }, // نوع العضو
+    { wch: 35 }, // الوحدة/اللجنة
     { wch: 20 }, // الصفة
     { wch: 15 }, // طريقة الدفع
     { wch: 20 }, // اسم المنسق

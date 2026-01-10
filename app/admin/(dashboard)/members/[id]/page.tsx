@@ -142,19 +142,23 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  نوع الكيان
+                  نوع العضو
                 </p>
                 <p className="font-medium text-gray-900">
-                  {member.entityType === "unit" ? "وحدة" : "لجنة"}{" "}
-                  <span className="text-gray-500 text-xs">
-                    ({member.entityLevel === "central" ? "مركزي" : "محافظة"})
-                  </span>
+                  {member.memberType === "student" ? "طالب" : "خريج"}
                 </p>
-                {member.entityName && (
-                  <p className="text-sm text-gray-600 mt-1">{member.entityName}</p>
-                )}
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  الوحدة / اللجنة
+                </p>
+                <p className="font-medium text-gray-900">{member.entityName}</p>
               </div>
 
               <div className="bg-gray-50 rounded-xl p-4">
