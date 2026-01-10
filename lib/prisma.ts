@@ -14,10 +14,20 @@ const prismaClientSingleton = () => {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({
+    connectionString,
+    max: 10, // Maximum connections in pool
+    min: 2, // Minimum connections in pool
+    idleTimeoutMillis: 30000, // Close idle connections after 30s
+    connectionTimeoutMillis: 10000, // Timeout after 10s when connecting
+  });
+
   const adapter = new PrismaPg(pool);
 
-  return new PrismaClient({ adapter });
+  return new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
+  });
 };
 
 export const prisma = globalThis.prisma ?? prismaClientSingleton();
