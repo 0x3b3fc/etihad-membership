@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { governorates } from "../data/governorates";
+import { entities } from "../data/entities";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
@@ -27,13 +28,15 @@ export const memberSchema = z
       .refine((val) => governorates.includes(val as (typeof governorates)[number]), {
         message: "يرجى اختيار محافظة صحيحة",
       }),
-    entityType: z.enum(["unit", "committee"], {
-      message: "يرجى اختيار نوع الكيان",
+    memberType: z.enum(["student", "graduate"], {
+      message: "يرجى اختيار نوع العضو",
     }),
-    entityLevel: z.enum(["central", "governorate"], {
-      message: "يرجى اختيار مستوى الكيان",
-    }),
-    entityName: z.string().optional(),
+    entityName: z
+      .string()
+      .min(1, "الوحدة/اللجنة مطلوبة")
+      .refine((val) => entities.includes(val as (typeof entities)[number]), {
+        message: "يرجى اختيار وحدة أو لجنة صحيحة",
+      }),
     role: z
       .string()
       .min(1, "الصفة داخل الاتحاد مطلوبة")

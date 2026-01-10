@@ -13,9 +13,8 @@ model Member {
   fullNameAr      String
   fullNameEn      String
   governorate     String
-  entityType      EntityType
-  entityLevel     EntityLevel
-  entityName      String?
+  memberType      MemberType
+  entityName      String
   role            String
   profileImage    String
   paymentMethod   PaymentMethod
@@ -33,14 +32,9 @@ model MemberCounter {
   counter   Int    @default(5000)
 }
 
-enum EntityType {
-  unit
-  committee
-}
-
-enum EntityLevel {
-  central
-  governorate
+enum MemberType {
+  student
+  graduate
 }
 
 model Admin {

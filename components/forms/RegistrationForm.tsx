@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { memberSchema, type MemberFormData } from "@/lib/validations/member";
 import { governorates } from "@/lib/data/governorates";
+import { entities, memberTypes, paymentInfo } from "@/lib/data/entities";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import RadioGroup from "@/components/ui/RadioGroup";
@@ -30,14 +31,13 @@ export default function RegistrationForm() {
     resolver: zodResolver(memberSchema),
     defaultValues: {
       paymentMethod: undefined,
-      entityType: undefined,
-      entityLevel: undefined,
+      memberType: undefined,
+      entityName: "",
     },
   });
 
   const paymentMethod = watch("paymentMethod");
-  const entityType = watch("entityType");
-  const entityLevel = watch("entityLevel");
+  const memberType = watch("memberType");
 
   const onSubmit = async (data: MemberFormData) => {
     setGeneralError(null);
@@ -57,11 +57,8 @@ export default function RegistrationForm() {
       formData.append("fullNameAr", data.fullNameAr);
       formData.append("fullNameEn", data.fullNameEn);
       formData.append("governorate", data.governorate);
-      formData.append("entityType", data.entityType);
-      formData.append("entityLevel", data.entityLevel);
-      if (data.entityName) {
-        formData.append("entityName", data.entityName);
-      }
+      formData.append("memberType", data.memberType);
+      formData.append("entityName", data.entityName);
       formData.append("role", data.role);
       formData.append("paymentMethod", data.paymentMethod);
       formData.append("profileImage", profileImage);
@@ -108,15 +105,15 @@ export default function RegistrationForm() {
     label: gov,
   }));
 
-  const entityTypeOptions = [
-    { value: "unit", label: "وحدة" },
-    { value: "committee", label: "لجنة" },
-  ];
+  const memberTypeOptions = memberTypes.map((type) => ({
+    value: type.value,
+    label: type.label,
+  }));
 
-  const entityLevelOptions = [
-    { value: "central", label: "مركزي (على مستوى الجمهورية)" },
-    { value: "governorate", label: "محافظة" },
-  ];
+  const entityOptions = entities.map((entity) => ({
+    value: entity,
+    label: entity,
+  }));
 
   const paymentOptions = [
     { value: "coordinator", label: "منسق المحافظة" },
@@ -175,32 +172,23 @@ export default function RegistrationForm() {
         {...register("governorate")}
       />
 
-      {/* Entity Type & Level */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <RadioGroup
-          label="نوع الكيان"
-          options={entityTypeOptions}
-          value={entityType}
-          onValueChange={(value) => setValue("entityType", value as "unit" | "committee")}
-          error={errors.entityType?.message}
-          required
-        />
-
-        <RadioGroup
-          label="المستوى"
-          options={entityLevelOptions}
-          value={entityLevel}
-          onValueChange={(value) => setValue("entityLevel", value as "central" | "governorate")}
-          error={errors.entityLevel?.message}
-          required
-        />
-      </div>
+      {/* Member Type */}
+      <RadioGroup
+        label="نوع العضو"
+        options={memberTypeOptions}
+        value={memberType}
+        onValueChange={(value) => setValue("memberType", value as "student" | "graduate")}
+        error={errors.memberType?.message}
+        required
+      />
 
       {/* Entity Name */}
-      <Input
-        label={entityType === "committee" ? "اسم اللجنة" : "اسم الوحدة"}
-        placeholder={entityType === "committee" ? "مثال: لجنة الشباب" : "مثال: وحدة التدريب"}
+      <Select
+        label="الوحدة / اللجنة"
+        options={entityOptions}
+        placeholder="اختر الوحدة أو اللجنة"
         error={errors.entityName?.message}
+        required
         {...register("entityName")}
       />
 
@@ -251,6 +239,21 @@ export default function RegistrationForm() {
           {...register("instapayRef")}
         />
       )}
+
+      {/* Membership Fees Info */}
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+        <h4 className="font-semibold text-blue-900 mb-2">رسوم العضوية:</h4>
+        <ul className="text-blue-800 space-y-1 mb-3">
+          <li>• الطالب: {paymentInfo.studentFee}</li>
+          <li>• الخريج: {paymentInfo.graduateFee}</li>
+        </ul>
+        <p className="text-blue-900">
+          لسداد رسوم العضوية يتم السداد على رقم الحساب التالي:
+        </p>
+        <p className="font-mono font-bold text-blue-900 text-lg mt-1" dir="ltr">
+          {paymentInfo.accountNumber}
+        </p>
+      </div>
 
       {/* Submit Button */}
       <Button

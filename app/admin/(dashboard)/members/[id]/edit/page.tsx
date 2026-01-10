@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Member } from "@prisma/client";
 import { governorates } from "@/lib/data/governorates";
+import { entities, memberTypes } from "@/lib/data/entities";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -31,8 +32,7 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
     fullNameEn: "",
     nationalId: "",
     governorate: "",
-    entityType: "" as "unit" | "committee" | "",
-    entityLevel: "" as "central" | "governorate" | "",
+    memberType: "" as "student" | "graduate" | "",
     entityName: "",
     role: "",
     paymentMethod: "" as "coordinator" | "instapay" | "",
@@ -53,8 +53,7 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
             fullNameEn: data.data.fullNameEn,
             nationalId: data.data.nationalId,
             governorate: data.data.governorate,
-            entityType: data.data.entityType,
-            entityLevel: data.data.entityLevel,
+            memberType: data.data.memberType,
             entityName: data.data.entityName || "",
             role: data.data.role,
             paymentMethod: data.data.paymentMethod,
@@ -111,15 +110,15 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
     label: gov,
   }));
 
-  const entityTypeOptions = [
-    { value: "unit", label: "وحدة" },
-    { value: "committee", label: "لجنة" },
-  ];
+  const memberTypeOptions = memberTypes.map((type) => ({
+    value: type.value,
+    label: type.label,
+  }));
 
-  const entityLevelOptions = [
-    { value: "central", label: "مركزي (على مستوى الجمهورية)" },
-    { value: "governorate", label: "محافظة" },
-  ];
+  const entityOptions = entities.map((entity) => ({
+    value: entity,
+    label: entity,
+  }));
 
   const paymentOptions = [
     { value: "coordinator", label: "منسق المحافظة" },
@@ -242,29 +241,22 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
                 required
               />
 
-              {/* Entity Type & Level */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <RadioGroup
-                  label="نوع الكيان"
-                  options={entityTypeOptions}
-                  value={formData.entityType}
-                  onValueChange={(value) => setFormData({ ...formData, entityType: value as "unit" | "committee" })}
-                  required
-                />
-                <RadioGroup
-                  label="المستوى"
-                  options={entityLevelOptions}
-                  value={formData.entityLevel}
-                  onValueChange={(value) => setFormData({ ...formData, entityLevel: value as "central" | "governorate" })}
-                  required
-                />
-              </div>
+              {/* Member Type */}
+              <RadioGroup
+                label="نوع العضو"
+                options={memberTypeOptions}
+                value={formData.memberType}
+                onValueChange={(value) => setFormData({ ...formData, memberType: value as "student" | "graduate" })}
+                required
+              />
 
               {/* Entity Name */}
-              <Input
-                label={formData.entityType === "committee" ? "اسم اللجنة" : "اسم الوحدة"}
+              <Select
+                label="الوحدة / اللجنة"
+                options={entityOptions}
                 value={formData.entityName}
                 onChange={(e) => setFormData({ ...formData, entityName: e.target.value })}
+                required
               />
 
               {/* Role */}

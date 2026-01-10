@@ -10,12 +10,8 @@ interface MemberTableProps {
   onDelete?: (member: Member) => void;
 }
 
-function getEntityTypeLabel(type: string): string {
-  return type === "unit" ? "وحدة" : "لجنة";
-}
-
-function getEntityLevelLabel(level: string): string {
-  return level === "central" ? "مركزي" : "محافظة";
+function getMemberTypeLabel(type: string): string {
+  return type === "student" ? "طالب" : "خريج";
 }
 
 export default function MemberTable({ members, onViewQR, onDelete }: MemberTableProps) {
@@ -51,7 +47,8 @@ export default function MemberTable({ members, onViewQR, onDelete }: MemberTable
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الاسم</th>
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الرقم القومي</th>
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">المحافظة</th>
-            <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الكيان</th>
+            <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">نوع العضو</th>
+            <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الوحدة/اللجنة</th>
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الصفة</th>
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">التاريخ</th>
             <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الإجراءات</th>
@@ -85,17 +82,13 @@ export default function MemberTable({ members, onViewQR, onDelete }: MemberTable
               </td>
               <td className="py-3 px-4 text-gray-700 text-sm">{member.governorate}</td>
               <td className="py-3 px-4">
-                <div>
-                  <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                    member.entityType === "unit" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
-                  }`}>
-                    {getEntityTypeLabel(member.entityType)}
-                  </span>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {member.entityName || getEntityLevelLabel(member.entityLevel)}
-                  </p>
-                </div>
+                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                  member.memberType === "student" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                }`}>
+                  {getMemberTypeLabel(member.memberType)}
+                </span>
               </td>
+              <td className="py-3 px-4 text-gray-700 text-sm">{member.entityName}</td>
               <td className="py-3 px-4 text-gray-700 text-sm">{member.role}</td>
               <td className="py-3 px-4 text-gray-700 text-sm">
                 {new Date(member.createdAt).toLocaleDateString("ar-EG")}

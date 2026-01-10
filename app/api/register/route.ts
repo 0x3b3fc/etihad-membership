@@ -33,9 +33,8 @@ export async function POST(request: NextRequest) {
     const fullNameAr = formData.get("fullNameAr") as string;
     const fullNameEn = formData.get("fullNameEn") as string;
     const governorate = formData.get("governorate") as string;
-    const entityType = formData.get("entityType") as string;
-    const entityLevel = formData.get("entityLevel") as string;
-    const entityName = formData.get("entityName") as string | null;
+    const memberType = formData.get("memberType") as string;
+    const entityName = formData.get("entityName") as string;
     const role = formData.get("role") as string;
     const paymentMethod = formData.get("paymentMethod") as string;
     const coordinatorName = formData.get("coordinatorName") as string | null;
@@ -48,9 +47,8 @@ export async function POST(request: NextRequest) {
       fullNameAr,
       fullNameEn,
       governorate,
-      entityType,
-      entityLevel,
-      entityName: entityName || undefined,
+      memberType,
+      entityName,
       role,
       paymentMethod,
       coordinatorName: coordinatorName || undefined,
@@ -130,9 +128,8 @@ export async function POST(request: NextRequest) {
         fullNameAr: validationResult.data.fullNameAr,
         fullNameEn: validationResult.data.fullNameEn,
         governorate: validationResult.data.governorate,
-        entityType: validationResult.data.entityType,
-        entityLevel: validationResult.data.entityLevel,
-        entityName: validationResult.data.entityName || null,
+        memberType: validationResult.data.memberType,
+        entityName: validationResult.data.entityName,
         role: validationResult.data.role,
         profileImage: profileImageUrl,
         paymentMethod: validationResult.data.paymentMethod,

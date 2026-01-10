@@ -8,9 +8,8 @@ interface MemberData {
   fullNameAr: string;
   fullNameEn: string;
   governorate: string;
-  entityType: string;
-  entityLevel: string;
-  entityName: string | null;
+  memberType: string;
+  entityName: string;
   role: string;
   profileImage: string;
   qrCode: string;
@@ -21,12 +20,8 @@ interface MemberProfileProps {
   member: MemberData;
 }
 
-function getEntityTypeLabel(type: string): string {
-  return type === "unit" ? "وحدة" : "لجنة";
-}
-
-function getEntityLevelLabel(level: string): string {
-  return level === "central" ? "مركزي" : "محافظة";
+function getMemberTypeLabel(type: string): string {
+  return type === "student" ? "طالب" : "خريج";
 }
 
 export default function MemberProfile({ member }: MemberProfileProps) {
@@ -98,14 +93,23 @@ export default function MemberProfile({ member }: MemberProfileProps) {
             <div className="bg-gray-50 rounded-lg p-3 text-center">
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <p className="text-xs text-gray-500 mb-0.5">{getEntityTypeLabel(member.entityType)}</p>
-              <p className="font-semibold text-sm text-gray-900">
-                {member.entityName || getEntityLevelLabel(member.entityLevel)}
-              </p>
+              <p className="text-xs text-gray-500 mb-0.5">نوع العضو</p>
+              <p className="font-semibold text-sm text-gray-900">{getMemberTypeLabel(member.memberType)}</p>
             </div>
+          </div>
+
+          {/* Entity Name */}
+          <div className="bg-gray-50 rounded-lg p-3 text-center mb-4">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <p className="text-xs text-gray-500 mb-0.5">الوحدة / اللجنة</p>
+            <p className="font-semibold text-sm text-gray-900">{member.entityName}</p>
           </div>
 
           {/* Date */}
