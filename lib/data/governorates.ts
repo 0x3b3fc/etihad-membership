@@ -1,0 +1,66 @@
+export const governorates = [
+  "القاهرة",
+  "الجيزة",
+  "الإسكندرية",
+  "الدقهلية",
+  "البحر الأحمر",
+  "البحيرة",
+  "الفيوم",
+  "الغربية",
+  "الإسماعيلية",
+  "المنوفية",
+  "المنيا",
+  "القليوبية",
+  "الوادي الجديد",
+  "السويس",
+  "أسوان",
+  "أسيوط",
+  "بني سويف",
+  "بورسعيد",
+  "دمياط",
+  "الشرقية",
+  "جنوب سيناء",
+  "كفر الشيخ",
+  "مطروح",
+  "الأقصر",
+  "قنا",
+  "شمال سيناء",
+  "سوهاج",
+] as const;
+
+export type Governorate = (typeof governorates)[number];
+
+// Governorate code mapping (Arabic to 2-letter English code)
+export const governorateCodes: Record<Governorate, string> = {
+  "القاهرة": "CA",
+  "الجيزة": "GZ",
+  "الإسكندرية": "AX",
+  "الدقهلية": "DK",
+  "البحر الأحمر": "RS",
+  "البحيرة": "BH",
+  "الفيوم": "FY",
+  "الغربية": "GH",
+  "الإسماعيلية": "IS",
+  "المنوفية": "MN",
+  "المنيا": "MY",
+  "القليوبية": "QL",
+  "الوادي الجديد": "NV",
+  "السويس": "SZ",
+  "أسوان": "AS",
+  "أسيوط": "AY",
+  "بني سويف": "BS",
+  "بورسعيد": "PS",
+  "دمياط": "DM",
+  "الشرقية": "SH",
+  "جنوب سيناء": "SS",
+  "كفر الشيخ": "KS",
+  "مطروح": "MT",
+  "الأقصر": "LX",
+  "قنا": "QN",
+  "شمال سيناء": "NS",
+  "سوهاج": "SG",
+};
+
+export function getGovernorateCode(governorate: string): string {
+  return governorateCodes[governorate as Governorate] || "XX";
+}
