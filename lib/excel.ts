@@ -14,6 +14,7 @@ interface ExcelMember {
   "اسم المنسق": string;
   "رقم Instapay": string;
   "رابط الصورة": string;
+  "رابط إيصال الدفع": string;
   "رابط QR": string;
   "تاريخ التسجيل": string;
 }
@@ -32,6 +33,7 @@ export function generateExcel(members: Member[]): Buffer {
     "اسم المنسق": member.coordinatorName || "-",
     "رقم Instapay": member.instapayRef || "-",
     "رابط الصورة": member.profileImage,
+    "رابط إيصال الدفع": member.paymentReceipt || "-",
     "رابط QR": member.qrCode,
     "تاريخ التسجيل": new Date(member.createdAt).toLocaleDateString("ar-EG", {
       year: "numeric",
@@ -54,6 +56,7 @@ export function generateExcel(members: Member[]): Buffer {
       "اسم المنسق",
       "رقم Instapay",
       "رابط الصورة",
+      "رابط إيصال الدفع",
       "رابط QR",
       "تاريخ التسجيل",
     ],
@@ -76,6 +79,7 @@ export function generateExcel(members: Member[]): Buffer {
     { wch: 20 }, // اسم المنسق
     { wch: 20 }, // رقم Instapay
     { wch: 50 }, // رابط الصورة
+    { wch: 50 }, // رابط إيصال الدفع
     { wch: 50 }, // رابط QR
     { wch: 20 }, // تاريخ التسجيل
   ];

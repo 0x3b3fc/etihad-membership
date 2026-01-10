@@ -17,7 +17,9 @@ export default function RegistrationForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [paymentReceipt, setPaymentReceipt] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [nationalIdError, setNationalIdError] = useState<string | null>(null);
 
@@ -42,10 +44,16 @@ export default function RegistrationForm() {
   const onSubmit = async (data: MemberFormData) => {
     setGeneralError(null);
     setImageError(null);
+    setReceiptError(null);
     setNationalIdError(null);
 
     if (!profileImage) {
       setImageError("الصورة الشخصية مطلوبة");
+      return;
+    }
+
+    if (!paymentReceipt) {
+      setReceiptError("صورة إيصال الدفع مطلوبة");
       return;
     }
 
@@ -62,6 +70,7 @@ export default function RegistrationForm() {
       formData.append("role", data.role);
       formData.append("paymentMethod", data.paymentMethod);
       formData.append("profileImage", profileImage);
+      formData.append("paymentReceipt", paymentReceipt);
 
       if (data.coordinatorName) {
         formData.append("coordinatorName", data.coordinatorName);
@@ -82,6 +91,8 @@ export default function RegistrationForm() {
           result.errors.forEach((err: { field: string; message: string }) => {
             if (err.field === "profileImage") {
               setImageError(err.message);
+            } else if (err.field === "paymentReceipt") {
+              setReceiptError(err.message);
             } else if (err.field === "nationalId") {
               setNationalIdError(err.message);
             } else if (err.field === "general") {
@@ -254,6 +265,14 @@ export default function RegistrationForm() {
           {paymentInfo.accountNumber}
         </p>
       </div>
+
+      {/* Payment Receipt */}
+      <FileUpload
+        label="صورة إيصال الدفع"
+        required
+        error={receiptError || undefined}
+        onChange={setPaymentReceipt}
+      />
 
       {/* Submit Button */}
       <Button

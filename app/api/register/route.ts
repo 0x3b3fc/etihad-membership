@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
     const coordinatorName = formData.get("coordinatorName") as string | null;
     const instapayRef = formData.get("instapayRef") as string | null;
     const profileImageFile = formData.get("profileImage") as File | null;
+    const paymentReceiptFile = formData.get("paymentReceipt") as File | null;
 
     // Validate form data
     const validationResult = memberSchema.safeParse({
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate image
+    // Validate profile image
     if (!profileImageFile) {
       return NextResponse.json(
         { success: false, errors: [{ field: "profileImage", message: "الصورة الشخصية مطلوبة" }] },
@@ -102,7 +103,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert image to base64 and upload
+    // Validate payment receipt
+    if (!paymentReceiptFile) {
+      return NextResponse.json(
+        { success: false, errors: [{ field: "paymentReceipt", message: "صورة إيصال الدفع مطلوبة" }] },
+        { status: 400 }
+      );
+    }
+
+    const receiptValidation = imageSchema.safeParse({
+      size: paymentReceiptFile.size,
+      type: paymentReceiptFile.type,
+    });
+
+    if (!receiptValidation.success) {
+      const errors = receiptValidation.error.issues.map((e) => ({
+        field: "paymentReceipt",
+        message: e.message,
+      }));
+      return NextResponse.json(
+        { success: false, errors },
+        { status: 400 }
+      );
+    }
+
+    // Convert profile image to base64 and upload
     const bytes = await profileImageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64Image = `data:${profileImageFile.type};base64,${buffer.toString("base64")}`;
@@ -113,6 +138,21 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json(
         { success: false, errors: [{ field: "profileImage", message: "فشل في رفع الصورة، يرجى المحاولة مرة أخرى" }] },
+        { status: 500 }
+      );
+    }
+
+    // Convert payment receipt to base64 and upload
+    const receiptBytes = await paymentReceiptFile.arrayBuffer();
+    const receiptBuffer = Buffer.from(receiptBytes);
+    const base64Receipt = `data:${paymentReceiptFile.type};base64,${receiptBuffer.toString("base64")}`;
+
+    let paymentReceiptUrl: string;
+    try {
+      paymentReceiptUrl = await uploadImage(base64Receipt);
+    } catch {
+      return NextResponse.json(
+        { success: false, errors: [{ field: "paymentReceipt", message: "فشل في رفع صورة الإيصال، يرجى المحاولة مرة أخرى" }] },
         { status: 500 }
       );
     }
@@ -135,6 +175,7 @@ export async function POST(request: NextRequest) {
         paymentMethod: validationResult.data.paymentMethod,
         coordinatorName: validationResult.data.coordinatorName || null,
         instapayRef: validationResult.data.instapayRef || null,
+        paymentReceipt: paymentReceiptUrl,
         qrCode: "", // Will be updated after creation
       },
     });

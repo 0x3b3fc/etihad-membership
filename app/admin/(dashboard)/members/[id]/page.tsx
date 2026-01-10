@@ -222,6 +222,44 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
           </div>
         </div>
 
+        {/* Payment Receipt Card */}
+        {member.paymentReceipt && (
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">إيصال الدفع</h3>
+              </div>
+              <div className="flex justify-center">
+                <div className="relative w-full max-w-md">
+                  <Image
+                    src={member.paymentReceipt}
+                    alt="إيصال الدفع"
+                    width={400}
+                    height={300}
+                    className="rounded-xl border border-gray-200 shadow-md object-contain w-full"
+                  />
+                  <a
+                    href={member.paymentReceipt}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-2 left-2 inline-flex items-center gap-1 px-3 py-1.5 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg text-sm hover:bg-white transition-colors shadow-sm"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    فتح
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* QR Code Card */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
