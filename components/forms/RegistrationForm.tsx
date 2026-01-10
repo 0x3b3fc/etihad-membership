@@ -251,6 +251,14 @@ export default function RegistrationForm() {
         />
       )}
 
+      {/* Payment Receipt */}
+      <FileUpload
+        label="صورة إيصال الدفع"
+        required
+        error={receiptError || undefined}
+        onChange={setPaymentReceipt}
+      />
+
       {/* Membership Fees Info */}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
         <h4 className="font-semibold text-blue-900 mb-2">رسوم العضوية:</h4>
@@ -265,14 +273,6 @@ export default function RegistrationForm() {
           {paymentInfo.accountNumber}
         </p>
       </div>
-
-      {/* Payment Receipt */}
-      <FileUpload
-        label="صورة إيصال الدفع"
-        required
-        error={receiptError || undefined}
-        onChange={setPaymentReceipt}
-      />
 
       {/* Submit Button */}
       <Button
