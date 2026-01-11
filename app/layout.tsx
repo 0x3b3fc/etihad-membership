@@ -10,7 +10,7 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   title: "عضويتي - اتحاد بشبابها",
-  description: "منصة تسجيل عضوية اتحاد الشباب",
+  description: "منصة تسجيل عضوية اتحاد بشبابها",
 };
 
 export default function RootLayout({

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { baseMemberSchema, type MemberFormData } from "@/lib/validations/member";
@@ -300,6 +301,15 @@ export default function RegistrationForm() {
       <p className="text-center text-xs text-gray-500">
         جميع الحقول المشار إليها بـ <span className="text-red-500">*</span> إلزامية
       </p>
+
+      <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+        <p className="text-gray-600 text-sm">
+          لديك حساب بالفعل؟{" "}
+          <Link href="/login" className="text-[#1e3a5f] font-semibold hover:underline">
+            سجل دخولك
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }
