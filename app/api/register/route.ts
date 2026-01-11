@@ -4,6 +4,12 @@ import { memberSchema, imageSchema } from "@/lib/validations/member";
 import { uploadImage } from "@/lib/cloudinary";
 import { generateQRCode } from "@/lib/qrcode";
 import { getGovernorateCode, governorates, type Governorate } from "@/lib/data/governorates";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+
+function generatePassword(): string {
+  return crypto.randomBytes(8).toString("hex"); // 16 characters
+}
 
 async function generateMemberNumber(governorate: string): Promise<string> {
   const prefix = getGovernorateCode(governorate);
@@ -162,11 +168,16 @@ export async function POST(request: NextRequest) {
     // Generate member number
     const memberNumber = await generateMemberNumber(validationResult.data.governorate);
 
+    // Generate random password
+    const plainPassword = generatePassword();
+    const hashedPassword = await bcrypt.hash(plainPassword, 12);
+
     // Create member with temporary QR code
     const member = await prisma.member.create({
       data: {
         memberNumber,
         nationalId: validationResult.data.nationalId,
+        password: hashedPassword,
         fullNameAr: validationResult.data.fullNameAr,
         fullNameEn: validationResult.data.fullNameEn,
         governorate: validationResult.data.governorate,
@@ -197,6 +208,8 @@ export async function POST(request: NextRequest) {
       message: "تم تسجيل العضوية بنجاح",
       memberId: member.id,
       memberNumber: member.memberNumber,
+      nationalId: member.nationalId,
+      password: plainPassword,
     });
   } catch (error) {
     console.error("Registration error:", error);

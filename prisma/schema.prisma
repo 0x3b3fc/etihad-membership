@@ -10,6 +10,7 @@ model Member {
   id              String        @id @default(uuid())
   memberNumber    String        @unique
   nationalId      String        @unique
+  password        String
   fullNameAr      String
   fullNameEn      String
   governorate     String

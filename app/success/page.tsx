@@ -5,9 +5,9 @@ import Button from "@/components/ui/Button";
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; memberNumber?: string; nationalId?: string; password?: string }>;
 }) {
-  const { id } = await searchParams;
+  const { id, memberNumber, nationalId, password } = await searchParams;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -59,27 +59,64 @@ export default async function SuccessPage({
                 مرحباً بك في عائلة اتحاد بشبابها
               </p>
 
-              {/* Member ID */}
-              {id && (
-                <div className="bg-gray-50 rounded-lg p-4 mb-6 border">
-                  <p className="text-xs text-gray-500 mb-2">رقم العضوية</p>
-                  <p className="font-mono text-sm text-gray-900 break-all">
-                    {id}
+              {/* Member Number */}
+              {memberNumber && (
+                <div className="bg-[#1e3a5f]/5 rounded-lg p-4 mb-4 border border-[#1e3a5f]/20">
+                  <p className="text-xs text-gray-500 mb-1">رقم العضوية</p>
+                  <p className="font-mono text-lg font-bold text-[#1e3a5f]" dir="ltr">
+                    {memberNumber}
                   </p>
+                </div>
+              )}
+
+              {/* Login Credentials */}
+              {nationalId && password && (
+                <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-200 text-right">
+                  <div className="flex items-center gap-2 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <h3 className="font-bold text-amber-800">بيانات تسجيل الدخول</h3>
+                  </div>
+                  <p className="text-xs text-amber-700 mb-3">
+                    احفظ هذه البيانات جيداً، لن تظهر مرة أخرى!
+                  </p>
+                  <div className="space-y-3">
+                    <div className="bg-white rounded-lg p-3 border border-amber-200">
+                      <p className="text-xs text-gray-500 mb-1">الرقم القومي</p>
+                      <p className="font-mono text-sm text-gray-900 select-all" dir="ltr">
+                        {nationalId}
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-amber-200">
+                      <p className="text-xs text-gray-500 mb-1">كلمة المرور</p>
+                      <p className="font-mono text-sm text-gray-900 select-all" dir="ltr">
+                        {password}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {/* Action Buttons */}
               <div className="space-y-3">
+                <Link href="/login" className="block">
+                  <Button size="lg" className="w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    تسجيل الدخول
+                  </Button>
+                </Link>
                 {id && (
                   <Link href={`/member/${id}`} className="block">
-                    <Button size="lg" className="w-full">
+                    <Button variant="outline" size="lg" className="w-full">
                       عرض بطاقة العضوية
                     </Button>
                   </Link>
                 )}
                 <Link href="/" className="block">
-                  <Button variant="outline" size="lg" className="w-full">
+                  <Button variant="ghost" size="lg" className="w-full text-gray-600">
                     العودة للصفحة الرئيسية
                   </Button>
                 </Link>

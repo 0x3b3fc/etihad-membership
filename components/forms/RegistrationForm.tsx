@@ -104,7 +104,7 @@ export default function RegistrationForm() {
         return;
       }
 
-      router.push(`/success?id=${result.memberId}`);
+      router.push(`/success?id=${result.memberId}&memberNumber=${result.memberNumber}&nationalId=${result.nationalId}&password=${result.password}`);
     } catch {
       setGeneralError("حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى");
     } finally {
