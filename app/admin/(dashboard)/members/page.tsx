@@ -14,6 +14,9 @@ import DeleteConfirmModal from "@/components/ui/DeleteConfirmModal";
 interface MembersResponse {
   success: boolean;
   data: Member[];
+  stats: {
+    todayNew: number;
+  };
   pagination: {
     page: number;
     limit: number;
@@ -34,9 +37,11 @@ export default function AdminMembersPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [search, setSearch] = useState("");
   const [governorate, setGovernorate] = useState("");
+  const [entityName, setEntityName] = useState("");
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [todayNew, setTodayNew] = useState(0);
 
   const fetchMembers = useCallback(async () => {
     setIsLoading(true);
@@ -48,6 +53,7 @@ export default function AdminMembersPage() {
 
       if (search) params.append("search", search);
       if (governorate) params.append("governorate", governorate);
+      if (entityName) params.append("entityName", entityName);
 
       const response = await fetch(`/api/admin/members?${params}`);
       const data: MembersResponse = await response.json();
@@ -55,13 +61,14 @@ export default function AdminMembersPage() {
       if (data.success) {
         setMembers(data.data);
         setPagination(data.pagination);
+        setTodayNew(data.stats?.todayNew ?? 0);
       }
     } catch (error) {
       console.error("Error fetching members:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [pagination.page, pagination.limit, search, governorate]);
+  }, [pagination.page, pagination.limit, search, governorate, entityName]);
 
   useEffect(() => {
     fetchMembers();
@@ -77,6 +84,11 @@ export default function AdminMembersPage() {
     setPagination((prev) => ({ ...prev, page: 1 }));
   }, []);
 
+  const handleEntityFilter = useCallback((value: string) => {
+    setEntityName(value);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  }, []);
+
   const handleExport = async () => {
     setIsExporting(true);
     try {
@@ -84,6 +96,7 @@ export default function AdminMembersPage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (governorate) params.append("governorate", governorate);
+      if (entityName) params.append("entityName", entityName);
 
       const response = await fetch(`/api/admin/export-excel?${params}`);
       const blob = await response.blob();
@@ -91,7 +104,8 @@ export default function AdminMembersPage() {
       const a = document.createElement("a");
       a.href = url;
       const governorateSuffix = governorate ? `-${governorate}` : "";
-      a.download = `أعضاء-الاتحاد${governorateSuffix}-${new Date().toISOString().split("T")[0]}.xlsx`;
+      const entitySuffix = entityName ? `-${entityName}` : "";
+      a.download = `أعضاء-الاتحاد${governorateSuffix}${entitySuffix}-${new Date().toISOString().split("T")[0]}.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -172,7 +186,7 @@ export default function AdminMembersPage() {
             </div>
             <div>
               <p className="text-xs text-gray-500">أعضاء جدد اليوم</p>
-              <p className="text-lg font-bold text-gray-900">-</p>
+              <p className="text-lg font-bold text-gray-900">{todayNew}</p>
             </div>
           </div>
         </div>
@@ -197,6 +211,7 @@ export default function AdminMembersPage() {
         <SearchFilter
           onSearch={handleSearch}
           onFilter={handleFilter}
+          onEntityFilter={handleEntityFilter}
           onExport={handleExport}
           isExporting={isExporting}
         />

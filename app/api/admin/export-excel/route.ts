@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get("search") || "";
     const governorate = searchParams.get("governorate") || "";
+    const entityName = searchParams.get("entityName") || "";
 
     // Build where clause
     const where = {
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
             }
           : {},
         governorate ? { governorate } : {},
+        entityName ? { entityName } : {},
       ],
     };
 
@@ -44,7 +46,8 @@ export async function GET(request: NextRequest) {
 
     const date = new Date().toISOString().split("T")[0];
     const governorateSuffix = governorate ? `-${governorate}` : "";
-    const filename = `أعضاء-الاتحاد${governorateSuffix}-${date}.xlsx`;
+    const entitySuffix = entityName ? `-${entityName}` : "";
+    const filename = `أعضاء-الاتحاد${governorateSuffix}${entitySuffix}-${date}.xlsx`;
 
     return new NextResponse(new Uint8Array(excelBuffer), {
       headers: {

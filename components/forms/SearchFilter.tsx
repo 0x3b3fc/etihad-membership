@@ -5,10 +5,12 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import { governorates } from "@/lib/data/governorates";
+import { entities } from "@/lib/data/entities";
 
 interface SearchFilterProps {
   onSearch: (search: string) => void;
   onFilter: (governorate: string) => void;
+  onEntityFilter: (entityName: string) => void;
   onExport: () => void;
   isExporting?: boolean;
 }
@@ -16,11 +18,13 @@ interface SearchFilterProps {
 export default function SearchFilter({
   onSearch,
   onFilter,
+  onEntityFilter,
   onExport,
   isExporting = false,
 }: SearchFilterProps) {
   const [search, setSearch] = useState("");
   const [governorate, setGovernorate] = useState("");
+  const [entityName, setEntityName] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,10 +39,21 @@ export default function SearchFilter({
     ...governorates.map((gov) => ({ value: gov, label: gov })),
   ];
 
+  const entityOptions = [
+    { value: "", label: "جميع الوحدات" },
+    ...entities.map((entity) => ({ value: entity, label: entity })),
+  ];
+
   const handleGovernorateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setGovernorate(value);
     onFilter(value);
+  };
+
+  const handleEntityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setEntityName(value);
+    onEntityFilter(value);
   };
 
   return (
@@ -57,6 +72,15 @@ export default function SearchFilter({
           value={governorate}
           onChange={handleGovernorateChange}
           placeholder="المحافظة"
+        />
+      </div>
+
+      <div className="w-full md:w-56">
+        <Select
+          options={entityOptions}
+          value={entityName}
+          onChange={handleEntityChange}
+          placeholder="الوحدة"
         />
       </div>
 
