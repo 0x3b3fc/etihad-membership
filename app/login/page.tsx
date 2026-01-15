@@ -106,7 +106,16 @@ export default function MemberLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
+            <Link
+              href="/login/forgot-password"
+              className="text-gray-500 hover:text-[#1e3a5f] text-sm"
+            >
+              نسيت كلمة المرور؟
+            </Link>
+          </div>
+
+          <div className="mt-4 text-center">
             <p className="text-gray-500 text-sm">
               ليس لديك حساب؟{" "}
               <Link href="/" className="text-[#1e3a5f] font-semibold hover:underline">
