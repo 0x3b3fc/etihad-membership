@@ -22,6 +22,23 @@ export async function GET(
         profileImage: true,
         qrCode: true,
         createdAt: true,
+        attendances: {
+          select: {
+            id: true,
+            scannedAt: true,
+            event: {
+              select: {
+                id: true,
+                name: true,
+                category: true,
+                date: true,
+                location: true,
+                organizingEntity: true,
+              },
+            },
+          },
+          orderBy: { scannedAt: "desc" },
+        },
       },
     });
 

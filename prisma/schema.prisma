@@ -26,6 +26,8 @@ model Member {
   qrCode          String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+
+  attendances     Attendance[]
 }
 
 // Counter for generating sequential member numbers per governorate
@@ -46,6 +48,9 @@ model Admin {
   password  String
   name      String   @default("مدير النظام")
   createdAt DateTime @default(now())
+
+  createdEvents      Event[]
+  scannedAttendances Attendance[] @relation("AttendanceScanner")
 }
 
 enum PaymentMethod {
@@ -64,4 +69,52 @@ model Settings {
   instapayName     String?
   enableRegistration Boolean @default(true)
   updatedAt        DateTime @updatedAt
+}
+
+// Event Categories
+enum EventCategory {
+  workshop      // ورشة عمل
+  conference    // مؤتمر
+  meeting       // اجتماع
+  training      // تدريب
+  seminar       // ندوة
+  celebration   // احتفال
+  sports        // رياضي
+  cultural      // ثقافي
+  other         // أخرى
+}
+
+// Events Model
+model Event {
+  id               String        @id @default(uuid())
+  name             String
+  description      String?
+  category         EventCategory
+  organizingEntity String
+  location         String
+  date             DateTime
+  startTime        String
+  endTime          String?
+  isActive         Boolean       @default(true)
+  createdBy        String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  attendances      Attendance[]
+  creator          Admin         @relation(fields: [createdBy], references: [id])
+}
+
+// Attendance Model
+model Attendance {
+  id        String   @id @default(uuid())
+  eventId   String
+  memberId  String
+  scannedBy String
+  scannedAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  scanner   Admin    @relation("AttendanceScanner", fields: [scannedBy], references: [id])
+
+  @@unique([eventId, memberId])
 }
