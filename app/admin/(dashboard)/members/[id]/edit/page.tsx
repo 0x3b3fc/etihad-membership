@@ -296,15 +296,15 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
               )}
 
               {/* Submit Button */}
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" isLoading={isSaving} className="flex-1">
-                  حفظ التعديلات
-                </Button>
-                <Link href={`/admin/members/${id}`}>
-                  <Button type="button" variant="outline">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
+                <Link href={`/admin/members/${id}`} className="w-full sm:w-auto">
+                  <Button type="button" variant="outline" className="w-full">
                     إلغاء
                   </Button>
                 </Link>
+                <Button type="submit" isLoading={isSaving} className="w-full sm:flex-1">
+                  حفظ التعديلات
+                </Button>
               </div>
             </div>
           </form>

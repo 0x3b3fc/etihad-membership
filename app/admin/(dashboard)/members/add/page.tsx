@@ -246,20 +246,20 @@ export default function AddMemberPage() {
           )}
 
           {/* Submit Button */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
+            <Link href="/admin/members" className="w-full sm:w-auto">
+              <Button type="button" variant="outline" size="lg" className="w-full">
+                إلغاء
+              </Button>
+            </Link>
             <Button
               type="submit"
               size="lg"
-              className="flex-1"
+              className="w-full sm:flex-1"
               isLoading={isSubmitting}
             >
               إضافة العضو
             </Button>
-            <Link href="/admin/members">
-              <Button type="button" variant="outline" size="lg">
-                إلغاء
-              </Button>
-            </Link>
           </div>
         </form>
       </div>
