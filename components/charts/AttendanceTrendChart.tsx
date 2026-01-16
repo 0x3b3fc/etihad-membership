@@ -65,7 +65,7 @@ export default function AttendanceTrendChart({ data }: AttendanceTrendChartProps
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: number) => [`${value} حضور`, "العدد"]}
+            formatter={(value) => [`${value ?? 0} حضور`, "العدد"]}
             labelFormatter={(label) => `التاريخ: ${label}`}
           />
           <Area

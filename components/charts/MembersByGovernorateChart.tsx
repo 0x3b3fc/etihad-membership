@@ -60,7 +60,7 @@ export default function MembersByGovernorateChart({
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: number) => [`${value} عضو`, "العدد"]}
+            formatter={(value) => [`${value ?? 0} عضو`, "العدد"]}
             labelStyle={{ fontWeight: "bold", marginBottom: 4 }}
           />
           <Bar dataKey="count" radius={[0, 4, 4, 0]}>

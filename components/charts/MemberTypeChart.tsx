@@ -82,10 +82,13 @@ export default function MemberTypeChart({ data }: MemberTypeChartProps) {
               borderRadius: "8px",
               boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
             }}
-            formatter={(value: number) => [
-              `${value} (${total > 0 ? ((value / total) * 100).toFixed(1) : 0}%)`,
-              "العدد",
-            ]}
+            formatter={(value) => {
+              const numValue = Number(value) || 0;
+              return [
+                `${numValue} (${total > 0 ? ((numValue / total) * 100).toFixed(1) : 0}%)`,
+                "العدد",
+              ];
+            }}
           />
           <Legend
             verticalAlign="bottom"
