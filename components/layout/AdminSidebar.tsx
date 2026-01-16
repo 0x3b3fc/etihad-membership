@@ -112,10 +112,10 @@ export default function AdminSidebar() {
       <aside
         className={`
           fixed lg:static inset-y-0 right-0 z-40
-          w-64 bg-white border-l border-gray-200
+          w-[280px] max-w-[calc(100vw-3rem)] sm:w-64 bg-white border-l border-gray-200
           transform transition-transform duration-200 ease-in-out
           ${isMobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
-          flex flex-col min-h-screen
+          flex flex-col min-h-screen overflow-y-auto
         `}
       >
         {/* Logo Section */}

@@ -147,13 +147,13 @@ export default function AdminMembersPage() {
   return (
     <div className="pt-14 lg:pt-0">
       {/* Page Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">إدارة الأعضاء</h1>
           <p className="text-sm text-gray-500 mt-1">عرض وإدارة جميع أعضاء الاتحاد المسجلين</p>
         </div>
-        <Link href="/admin/members/add">
-          <Button>
+        <Link href="/admin/members/add" className="self-start sm:self-auto">
+          <Button className="w-full sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>

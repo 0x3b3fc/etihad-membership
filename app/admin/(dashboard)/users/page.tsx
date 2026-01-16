@@ -159,12 +159,12 @@ export default function AdminUsersPage() {
   return (
     <div className="pt-14 lg:pt-0">
       {/* Page Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">إدارة المسؤولين</h1>
           <p className="text-sm text-gray-500 mt-1">إضافة وتعديل وحذف مسؤولي النظام</p>
         </div>
-        <Button onClick={() => setShowAddModal(true)}>
+        <Button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto self-start sm:self-auto">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
@@ -202,67 +202,119 @@ export default function AdminUsersPage() {
             <p className="text-sm text-gray-500">قم بإضافة مسؤول جديد للنظام</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الاسم</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">البريد الإلكتروني</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">تاريخ الإضافة</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {admins.map((admin) => (
-                  <tr key={admin.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
-                            {admin.name.charAt(0)}
-                          </span>
-                        </div>
-                        <span className="font-medium text-gray-900">{admin.name}</span>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {admins.map((admin) => (
+                <div key={admin.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-medium text-sm">
+                          {admin.name.charAt(0)}
+                        </span>
                       </div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600">
-                      <span dir="ltr" className="inline-block text-left">{admin.email}</span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-600 text-sm">
-                      {new Date(admin.createdAt).toLocaleDateString("ar-EG", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => openEditModal(admin)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="تعديل"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => setAdminToDelete(admin)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="حذف"
-                          disabled={admins.length <= 1}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-900 truncate">{admin.name}</p>
+                        <p className="text-sm text-gray-500 truncate" dir="ltr">{admin.email}</p>
                       </div>
-                    </td>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => openEditModal(admin)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="تعديل"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setAdminToDelete(admin)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="حذف"
+                        disabled={admins.length <= 1}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 mr-13">
+                    تاريخ الإضافة: {new Date(admin.createdAt).toLocaleDateString("ar-EG", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الاسم</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">البريد الإلكتروني</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">تاريخ الإضافة</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-600 text-sm">الإجراءات</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {admins.map((admin) => (
+                    <tr key={admin.id} className="border-b border-gray-200 hover:bg-gray-50">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center">
+                            <span className="text-white font-medium text-sm">
+                              {admin.name.charAt(0)}
+                            </span>
+                          </div>
+                          <span className="font-medium text-gray-900">{admin.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        <span dir="ltr" className="inline-block text-left max-w-[200px] truncate">{admin.email}</span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600 text-sm">
+                        {new Date(admin.createdAt).toLocaleDateString("ar-EG", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => openEditModal(admin)}
+                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            title="تعديل"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => setAdminToDelete(admin)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="حذف"
+                            disabled={admins.length <= 1}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

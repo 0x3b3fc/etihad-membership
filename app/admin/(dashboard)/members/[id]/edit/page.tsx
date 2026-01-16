@@ -152,13 +152,13 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
   return (
     <div className="pt-14 lg:pt-0">
       {/* Page Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">تعديل بيانات العضو</h1>
-          <p className="text-sm text-gray-500 mt-1">تعديل بيانات {member.fullNameAr}</p>
+          <p className="text-sm text-gray-500 mt-1 truncate max-w-[250px] sm:max-w-none">تعديل بيانات {member.fullNameAr}</p>
         </div>
-        <Link href={`/admin/members/${id}`}>
-          <Button variant="outline">
+        <Link href={`/admin/members/${id}`} className="self-start sm:self-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -169,8 +169,8 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Preview */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border border-gray-200 p-6 text-center sticky top-6">
+        <div className="lg:col-span-1 order-first lg:order-none">
+          <div className="bg-white rounded-lg border border-gray-200 p-6 text-center lg:sticky lg:top-6">
             <div className="w-24 h-24 mx-auto mb-4 relative">
               <Image
                 src={member.profileImage}

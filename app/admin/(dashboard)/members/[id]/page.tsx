@@ -27,20 +27,20 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
   return (
     <div className="animate-fade-in">
       {/* Page Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#1e3a5f] to-[#4a90a4] rounded-xl flex items-center justify-center shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#1e3a5f] to-[#4a90a4] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">تفاصيل العضو</h1>
-            <p className="text-gray-500">عرض بيانات العضو الكاملة</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">تفاصيل العضو</h1>
+            <p className="text-gray-500 text-sm">عرض بيانات العضو الكاملة</p>
           </div>
         </div>
-        <Link href="/admin/members">
-          <Button variant="outline">
+        <Link href="/admin/members" className="self-start sm:self-auto">
+          <Button variant="outline" className="w-full sm:w-auto">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-2"
