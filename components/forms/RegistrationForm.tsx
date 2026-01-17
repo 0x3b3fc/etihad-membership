@@ -275,11 +275,6 @@ export default function RegistrationForm() {
 
       {/* Membership Fees Info */}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-        <h4 className="font-semibold text-blue-900 mb-2">رسوم العضوية:</h4>
-        <ul className="text-blue-800 space-y-1 mb-3">
-          <li>• الطالب: {paymentInfo.studentFee}</li>
-          <li>• الخريج: {paymentInfo.graduateFee}</li>
-        </ul>
         <p className="text-blue-900">
           لسداد رسوم العضوية يتم السداد على رقم الحساب التالي:
         </p>
