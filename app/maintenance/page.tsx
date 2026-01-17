@@ -37,15 +37,11 @@ export default function MaintenancePage() {
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a5f] mb-4">
-          الموقع تحت الصيانة
+تم انتهاء من المرحلة الاولي للموقع 
         </h1>
 
-        <p className="text-gray-600 text-sm sm:text-base mb-8">
-          نعمل حالياً على تحسين الموقع. سنعود قريباً إن شاء الله.
-        </p>
-
         <div className="text-xs text-gray-400">
-          اتحاد بشبابها
+          اتحاد بشبابها - عضويتي - وحدة الربط المركزي
         </div>
       </div>
     </div>
