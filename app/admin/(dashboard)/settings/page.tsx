@@ -175,57 +175,6 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Registration Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">إعدادات التسجيل</h2>
-
-          <div className="mb-4">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.enableRegistration}
-                onChange={(e) => handleChange("enableRegistration", e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-[#1e3a5f] focus:ring-[#1e3a5f]"
-              />
-              <span className="text-sm text-gray-700">تفعيل التسجيل</span>
-            </label>
-            <p className="text-xs text-gray-500 mt-1 mr-7">
-              عند إيقاف هذا الخيار، لن يتمكن أي شخص من التسجيل كعضو جديد
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="رسوم العضوية (جنيه)"
-              type="number"
-              value={settings.membershipFee.toString()}
-              onChange={(e) => handleChange("membershipFee", parseFloat(e.target.value) || 0)}
-              min="0"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        {/* Payment Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">إعدادات الدفع</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="رقم انستاباي"
-              value={settings.instapayNumber || ""}
-              onChange={(e) => handleChange("instapayNumber", e.target.value)}
-              placeholder="01XXXXXXXXX"
-            />
-            <Input
-              label="الاسم على انستاباي"
-              value={settings.instapayName || ""}
-              onChange={(e) => handleChange("instapayName", e.target.value)}
-              placeholder="اسم صاحب الحساب"
-            />
-          </div>
-        </div>
-
         {/* Submit Button */}
         <div className="flex justify-end">
           <Button type="submit" disabled={isSaving}>

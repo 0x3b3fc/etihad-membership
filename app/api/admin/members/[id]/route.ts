@@ -94,9 +94,6 @@ export async function PUT(
         memberType: body.memberType,
         entityName: body.entityName,
         role: body.role,
-        paymentMethod: body.paymentMethod,
-        coordinatorName: body.coordinatorName || null,
-        instapayRef: body.instapayRef || null,
       },
     });
 

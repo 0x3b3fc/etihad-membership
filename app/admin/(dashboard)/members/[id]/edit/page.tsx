@@ -35,9 +35,6 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
     memberType: "" as "student" | "graduate" | "",
     entityName: "",
     role: "",
-    paymentMethod: "" as "coordinator" | "instapay" | "",
-    coordinatorName: "",
-    instapayRef: "",
   });
 
   useEffect(() => {
@@ -56,9 +53,6 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
             memberType: data.data.memberType,
             entityName: data.data.entityName || "",
             role: data.data.role,
-            paymentMethod: data.data.paymentMethod,
-            coordinatorName: data.data.coordinatorName || "",
-            instapayRef: data.data.instapayRef || "",
           });
         } else {
           setError(data.message || "حدث خطأ في تحميل البيانات");
@@ -120,10 +114,6 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
     label: entity,
   }));
 
-  const paymentOptions = [
-    { value: "coordinator", label: "منسق المحافظة" },
-    { value: "instapay", label: "Instapay" },
-  ];
 
   if (isLoading) {
     return (
@@ -266,34 +256,6 @@ export default function EditMemberPage({ params }: EditMemberPageProps) {
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 required
               />
-
-              {/* Payment Method */}
-              <RadioGroup
-                label="طريقة سداد الرسوم"
-                options={paymentOptions}
-                value={formData.paymentMethod}
-                onValueChange={(value) => setFormData({ ...formData, paymentMethod: value as "coordinator" | "instapay" })}
-                required
-              />
-
-              {/* Conditional Fields */}
-              {formData.paymentMethod === "coordinator" && (
-                <Input
-                  label="اسم منسق المحافظة"
-                  value={formData.coordinatorName}
-                  onChange={(e) => setFormData({ ...formData, coordinatorName: e.target.value })}
-                  required
-                />
-              )}
-
-              {formData.paymentMethod === "instapay" && (
-                <Input
-                  label="الرقم المرجعي Instapay"
-                  value={formData.instapayRef}
-                  onChange={(e) => setFormData({ ...formData, instapayRef: e.target.value })}
-                  required
-                />
-              )}
 
               {/* Submit Button */}
               <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">

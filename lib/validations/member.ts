@@ -1,56 +1,72 @@
 import { z } from "zod";
 import { governorates } from "../data/governorates";
-import { entities } from "../data/entities";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 
 export const baseMemberSchema = z.object({
-  nationalId: z
-    .string()
-    .min(1, "الرقم القومي مطلوب")
-    .length(14, "الرقم القومي يجب أن يكون 14 رقم")
-    .regex(/^\d{14}$/, "الرقم القومي يجب أن يحتوي على أرقام فقط"),
-  fullNameAr: z
-    .string()
-    .min(1, "الاسم الرباعي باللغة العربية مطلوب")
-    .min(8, "يرجى إدخال الاسم الرباعي كاملاً")
-    .regex(/^[\u0600-\u06FF\s]+$/, "يجب أن يكون الاسم باللغة العربية فقط"),
-  fullNameEn: z
-    .string()
-    .min(1, "الاسم الرباعي باللغة الإنجليزية مطلوب")
-    .min(8, "يرجى إدخال الاسم الرباعي كاملاً")
-    .regex(/^[a-zA-Z\s]+$/, "يجب أن يكون الاسم باللغة الإنجليزية فقط"),
+  // البيانات الأساسية
   governorate: z
     .string()
     .min(1, "المحافظة مطلوبة")
     .refine((val) => governorates.includes(val as (typeof governorates)[number]), {
       message: "يرجى اختيار محافظة صحيحة",
     }),
+  fullNameAr: z
+    .string()
+    .min(1, "الاسم الرباعي باللغة العربية مطلوب")
+    .min(8, "يرجى إدخال الاسم الرباعي كاملاً")
+    .regex(/^[\u0600-\u06FF\s]+$/, "يجب أن يكون الاسم باللغة العربية فقط"),
+  nationalId: z
+    .string()
+    .min(1, "الرقم القومي مطلوب")
+    .length(14, "الرقم القومي يجب أن يكون 14 رقم")
+    .regex(/^\d{14}$/, "الرقم القومي يجب أن يحتوي على أرقام فقط"),
+  address: z
+    .string()
+    .min(1, "العنوان بالتفصيل مطلوب")
+    .min(10, "يرجى إدخال العنوان بالتفصيل"),
+  phone1: z
+    .string()
+    .min(1, "رقم الموبايل (1) مطلوب")
+    .regex(/^01[0125]\d{8}$/, "رقم الموبايل يجب أن يكون رقم مصري صحيح (01xxxxxxxxx)"),
+  phone2: z
+    .string()
+    .regex(/^01[0125]\d{8}$/, "رقم الموبايل (2) يجب أن يكون رقم مصري صحيح")
+    .optional()
+    .or(z.literal("")),
+  email: z
+    .string()
+    .email("البريد الالكتروني غير صالح")
+    .optional()
+    .or(z.literal("")),
+
+  // المؤهلات التعليمية
   memberType: z.enum(["student", "graduate"], {
-    message: "يرجى اختيار نوع العضو",
+    message: "يرجى اختيار طالب أو خريج",
   }),
-  entityName: z
+  universityName: z
     .string()
-    .min(1, "الوحدة/اللجنة مطلوبة")
-    .refine((val) => entities.includes(val as (typeof entities)[number]), {
-      message: "يرجى اختيار وحدة أو لجنة صحيحة",
-    }),
-  role: z
+    .min(1, "اسم الجامعة مطلوب")
+    .min(3, "اسم الجامعة يجب أن يكون 3 أحرف على الأقل"),
+  facultyName: z
     .string()
-    .min(1, "الصفة داخل الاتحاد مطلوبة")
-    .min(3, "يرجى إدخال صفة صحيحة"),
-  paymentMethod: z.enum(["coordinator", "instapay"], {
-    message: "يرجى اختيار طريقة الدفع",
+    .min(1, "اسم الكلية مطلوب")
+    .min(3, "اسم الكلية يجب أن يكون 3 أحرف على الأقل"),
+  academicYear: z.string().optional().or(z.literal("")),
+  postgraduateStudy: z
+    .enum(["none", "preliminary", "masters", "doctorate"]),
+
+  // الحالة الوظيفية
+  employmentStatus: z.enum(["working", "not_working"], {
+    message: "يرجى اختيار الحالة الوظيفية",
   }),
-  coordinatorName: z.string().optional(),
-  instapayRef: z.string().optional(),
-  amountPaid: z
-    .string()
-    .min(1, "المبلغ المدفوع مطلوب")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "يرجى إدخال مبلغ صحيح",
-    }),
+  jobTitle: z.string().optional().or(z.literal("")),
+  employer: z.string().optional().or(z.literal("")),
+
+  // الخبرات والمهارات
+  previousExperiences: z.string().optional().or(z.literal("")),
+  skills: z.string().optional().or(z.literal("")),
 });
 
 export type MemberFormData = z.infer<typeof baseMemberSchema>;
@@ -58,26 +74,38 @@ export type MemberFormData = z.infer<typeof baseMemberSchema>;
 export const memberSchema = baseMemberSchema
   .refine(
     (data) => {
-      if (data.paymentMethod === "coordinator") {
-        return data.coordinatorName && data.coordinatorName.length >= 3;
+      if (data.memberType === "student" && (!data.academicYear || data.academicYear.trim() === "")) {
+        return false;
       }
       return true;
     },
     {
-      message: "اسم منسق المحافظة مطلوب",
-      path: ["coordinatorName"],
+      message: "الفرقة مطلوبة للطلاب",
+      path: ["academicYear"],
     }
   )
   .refine(
     (data) => {
-      if (data.paymentMethod === "instapay") {
-        return data.instapayRef && data.instapayRef.length >= 3;
+      if (data.employmentStatus === "working" && (!data.jobTitle || data.jobTitle.trim() === "")) {
+        return false;
       }
       return true;
     },
     {
-      message: "الرقم المرجعي لعملية الدفع مطلوب",
-      path: ["instapayRef"],
+      message: "المسمى الوظيفي مطلوب عند اختيار 'أعمل'",
+      path: ["jobTitle"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.employmentStatus === "working" && (!data.employer || data.employer.trim() === "")) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "جهة العمل مطلوبة عند اختيار 'أعمل'",
+      path: ["employer"],
     }
   );
 

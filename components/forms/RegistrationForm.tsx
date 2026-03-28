@@ -7,22 +7,42 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { baseMemberSchema, type MemberFormData } from "@/lib/validations/member";
 import { governorates } from "@/lib/data/governorates";
-import { entities, memberTypes, paymentInfo } from "@/lib/data/entities";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import RadioGroup from "@/components/ui/RadioGroup";
 import FileUpload from "@/components/ui/FileUpload";
 import Button from "@/components/ui/Button";
 
+function TagInput({ label, placeholder, tags, onChange }: { label: string; placeholder: string; tags: string[]; onChange: (tags: string[]) => void }) {
+  const [input, setInput] = useState("");
+  const addTag = () => { const val = input.trim(); if (val && !tags.includes(val)) onChange([...tags, val]); setInput(""); };
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } if (e.key === "Backspace" && !input && tags.length > 0) onChange(tags.slice(0, -1)); };
+  return (
+    <div className="w-full space-y-1.5">
+      <label className="block text-sm font-medium text-gray-900">{label}</label>
+      <div className="flex flex-wrap gap-1.5 p-2 rounded-md border border-gray-200 min-h-[42px] focus-within:ring-1 focus-within:ring-[#1e3a5f] focus-within:border-[#1e3a5f] transition-colors">
+        {tags.map((tag, i) => (
+          <span key={i} className="inline-flex items-center gap-1 bg-[#1e3a5f]/10 text-[#1e3a5f] text-xs font-medium px-2 py-1 rounded-full">
+            {tag}
+            <button type="button" onClick={() => onChange(tags.filter((_, idx) => idx !== i))} className="hover:text-red-600"><svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+          </span>
+        ))}
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} onBlur={addTag} placeholder={tags.length === 0 ? placeholder : ""} className="flex-1 min-w-[120px] outline-none text-sm bg-transparent placeholder:text-gray-400" />
+      </div>
+      <p className="text-xs text-gray-400">اضغط Enter أو فاصلة للإضافة</p>
+    </div>
+  );
+}
+
 export default function RegistrationForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [paymentReceipt, setPaymentReceipt] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [receiptError, setReceiptError] = useState<string | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [nationalIdError, setNationalIdError] = useState<string | null>(null);
+  const [experienceTags, setExperienceTags] = useState<string[]>([]);
+  const [skillTags, setSkillTags] = useState<string[]>([]);
 
   const {
     register,
@@ -33,28 +53,30 @@ export default function RegistrationForm() {
   } = useForm<MemberFormData>({
     resolver: zodResolver(baseMemberSchema),
     defaultValues: {
-      paymentMethod: undefined,
       memberType: undefined,
-      entityName: "",
+      governorate: "",
+      postgraduateStudy: "none",
+      employmentStatus: "not_working",
+      academicYear: "",
+      phone2: "",
+      email: "",
+      jobTitle: "",
+      employer: "",
+      previousExperiences: undefined,
+      skills: undefined,
     },
   });
 
-  const paymentMethod = watch("paymentMethod");
   const memberType = watch("memberType");
+  const employmentStatus = watch("employmentStatus");
 
   const onSubmit = async (data: MemberFormData) => {
     setGeneralError(null);
     setImageError(null);
-    setReceiptError(null);
     setNationalIdError(null);
 
     if (!profileImage) {
       setImageError("الصورة الشخصية مطلوبة");
-      return;
-    }
-
-    if (!paymentReceipt) {
-      setReceiptError("صورة إيصال الدفع مطلوبة");
       return;
     }
 
@@ -64,22 +86,22 @@ export default function RegistrationForm() {
       const formData = new FormData();
       formData.append("nationalId", data.nationalId);
       formData.append("fullNameAr", data.fullNameAr);
-      formData.append("fullNameEn", data.fullNameEn);
       formData.append("governorate", data.governorate);
       formData.append("memberType", data.memberType);
-      formData.append("entityName", data.entityName);
-      formData.append("role", data.role);
-      formData.append("paymentMethod", data.paymentMethod);
+      formData.append("address", data.address);
+      formData.append("phone1", data.phone1);
+      if (data.phone2) formData.append("phone2", data.phone2);
+      if (data.email) formData.append("email", data.email);
+      formData.append("universityName", data.universityName);
+      formData.append("facultyName", data.facultyName);
+      if (data.academicYear) formData.append("academicYear", data.academicYear);
+      formData.append("postgraduateStudy", data.postgraduateStudy);
+      formData.append("employmentStatus", data.employmentStatus);
+      if (data.jobTitle) formData.append("jobTitle", data.jobTitle);
+      if (data.employer) formData.append("employer", data.employer);
+      if (experienceTags.length) formData.append("previousExperiences", experienceTags.join("، "));
+      if (skillTags.length) formData.append("skills", skillTags.join("، "));
       formData.append("profileImage", profileImage);
-      formData.append("paymentReceipt", paymentReceipt);
-
-      if (data.coordinatorName) {
-        formData.append("coordinatorName", data.coordinatorName);
-      }
-      if (data.instapayRef) {
-        formData.append("instapayRef", data.instapayRef);
-      }
-      formData.append("amountPaid", data.amountPaid.toString());
 
       const response = await fetch("/api/register", {
         method: "POST",
@@ -93,8 +115,6 @@ export default function RegistrationForm() {
           result.errors.forEach((err: { field: string; message: string }) => {
             if (err.field === "profileImage") {
               setImageError(err.message);
-            } else if (err.field === "paymentReceipt") {
-              setReceiptError(err.message);
             } else if (err.field === "nationalId") {
               setNationalIdError(err.message);
             } else if (err.field === "general") {
@@ -118,23 +138,35 @@ export default function RegistrationForm() {
     label: gov,
   }));
 
-  const memberTypeOptions = memberTypes.map((type) => ({
-    value: type.value,
-    label: type.label,
-  }));
+  const memberTypeOptions = [
+    { value: "student", label: "طالب" },
+    { value: "graduate", label: "خريج" },
+  ];
 
-  const entityOptions = entities.map((entity) => ({
-    value: entity,
-    label: entity,
-  }));
+  const academicYearOptions = [
+    { value: "الفرقة الأولى", label: "الفرقة الأولى" },
+    { value: "الفرقة الثانية", label: "الفرقة الثانية" },
+    { value: "الفرقة الثالثة", label: "الفرقة الثالثة" },
+    { value: "الفرقة الرابعة", label: "الفرقة الرابعة" },
+    { value: "الفرقة الخامسة", label: "الفرقة الخامسة" },
+    { value: "الفرقة السادسة", label: "الفرقة السادسة" },
+    { value: "الفرقة السابعة", label: "الفرقة السابعة" },
+  ];
 
-  const paymentOptions = [
-    { value: "coordinator", label: "منسق المحافظة" },
-    { value: "instapay", label: "Instapay" },
+  const postgraduateOptions = [
+    { value: "none", label: "لا يوجد" },
+    { value: "preliminary", label: "تمهيدي" },
+    { value: "masters", label: "ماجستير" },
+    { value: "doctorate", label: "دكتوراه" },
+  ];
+
+  const employmentOptions = [
+    { value: "working", label: "أعمل" },
+    { value: "not_working", label: "لا أعمل" },
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Error Alert */}
       {generalError && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
@@ -142,145 +174,214 @@ export default function RegistrationForm() {
         </div>
       )}
 
-      {/* National ID */}
-      <Input
-        label="الرقم القومي"
-        placeholder="00000000000000"
-        error={errors.nationalId?.message || nationalIdError || undefined}
-        required
-        maxLength={14}
-        dir="ltr"
-        className="text-left"
-        {...register("nationalId")}
-      />
+      {/* ============ البيانات الأساسية ============ */}
+      <div>
+        <h3 className="text-base sm:text-lg font-bold text-[#1e3a5f] mb-3 pb-2 border-b-2 border-[#1e3a5f]/20">
+          البيانات الأساسية
+        </h3>
 
-      {/* Name Fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="الاسم الرباعي بالعربية"
-          placeholder="محمد أحمد محمد علي"
-          error={errors.fullNameAr?.message}
-          required
-          {...register("fullNameAr")}
-        />
+        <div className="space-y-4">
+          {/* المحافظة */}
+          <Select
+            label="المحافظة"
+            options={governorateOptions}
+            placeholder="اختر المحافظة"
+            error={errors.governorate?.message}
+            required
+            {...register("governorate")}
+          />
 
-        <Input
-          label="الاسم الرباعي بالإنجليزية"
-          placeholder="Mohamed Ahmed Mohamed Ali"
-          error={errors.fullNameEn?.message}
-          required
-          dir="ltr"
-          className="text-left"
-          {...register("fullNameEn")}
-        />
+          {/* الأسم رباعي */}
+          <Input
+            label="الأسم رباعي"
+            placeholder="أحمد محمد علي حسن"
+            error={errors.fullNameAr?.message}
+            required
+            {...register("fullNameAr")}
+          />
+
+          {/* الرقم القومي */}
+          <Input
+            label="الرقم القومي"
+            placeholder="00000000000000"
+            error={errors.nationalId?.message || nationalIdError || undefined}
+            required
+            maxLength={14}
+            dir="ltr"
+            className="text-left"
+            {...register("nationalId")}
+          />
+
+          {/* العنوان بالتفصيل */}
+          <div className="w-full space-y-1.5">
+            <label className="block text-sm font-medium text-gray-900">
+              العنوان بالتفصيل
+              <span className="text-red-500 mr-1">*</span>
+            </label>
+            <textarea
+              placeholder="المحافظة - المدينة - الحي - الشارع - رقم المبنى"
+              rows={2}
+              className="flex w-full rounded-md border border-gray-200 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1e3a5f] focus:border-[#1e3a5f] disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("address")}
+            />
+            {errors.address?.message && (
+              <p className="text-xs text-red-500">{errors.address.message}</p>
+            )}
+          </div>
+
+          {/* الموبايل (1) و (2) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="الموبايل (1)"
+              placeholder="01012345678"
+              error={errors.phone1?.message}
+              required
+              maxLength={11}
+              dir="ltr"
+              className="text-left"
+              {...register("phone1")}
+            />
+            <Input
+              label="الموبايل (2)"
+              placeholder="01112345678"
+              error={errors.phone2?.message}
+              maxLength={11}
+              dir="ltr"
+              className="text-left"
+              {...register("phone2")}
+            />
+          </div>
+
+          {/* البريد الالكتروني */}
+          <Input
+            label="البريد الالكتروني"
+            placeholder="example@email.com"
+            type="email"
+            error={errors.email?.message}
+            dir="ltr"
+            className="text-left"
+            {...register("email")}
+          />
+
+          {/* الصورة الشخصية */}
+          <FileUpload
+            label="الصورة الشخصية"
+            required
+            error={imageError || undefined}
+            onChange={setProfileImage}
+          />
+        </div>
       </div>
 
-      {/* Governorate */}
-      <Select
-        label="المحافظة"
-        options={governorateOptions}
-        placeholder="اختر المحافظة"
-        error={errors.governorate?.message}
-        required
-        {...register("governorate")}
-      />
+      {/* ============ المؤهلات التعليمية ============ */}
+      <div>
+        <h3 className="text-base sm:text-lg font-bold text-[#1e3a5f] mb-3 pb-2 border-b-2 border-[#1e3a5f]/20">
+          المؤهلات التعليمية
+        </h3>
 
-      {/* Member Type */}
-      <RadioGroup
-        label="نوع العضو"
-        options={memberTypeOptions}
-        value={memberType}
-        onValueChange={(value) => setValue("memberType", value as "student" | "graduate")}
-        error={errors.memberType?.message}
-        required
-      />
+        <div className="space-y-4">
+          {/* طالب / خريج */}
+          <RadioGroup
+            label="الحالة"
+            options={memberTypeOptions}
+            value={memberType}
+            onValueChange={(value) => setValue("memberType", value as "student" | "graduate")}
+            error={errors.memberType?.message}
+            required
+          />
 
-      {/* Entity Name */}
-      <Select
-        label="الوحدة / اللجنة"
-        options={entityOptions}
-        placeholder="اختر الوحدة أو اللجنة"
-        error={errors.entityName?.message}
-        required
-        {...register("entityName")}
-      />
+          {/* اسم الجامعة و الكلية */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="اسم الجامعة"
+              placeholder="جامعة القاهرة"
+              error={errors.universityName?.message}
+              required
+              {...register("universityName")}
+            />
+            <Input
+              label="اسم الكلية"
+              placeholder="كلية الهندسة"
+              error={errors.facultyName?.message}
+              required
+              {...register("facultyName")}
+            />
+          </div>
 
-      {/* Role */}
-      <Input
-        label="الصفة داخل الاتحاد"
-        placeholder="عضو مجلس إدارة"
-        error={errors.role?.message}
-        required
-        {...register("role")}
-      />
+          {/* الفرقة - للطلاب فقط */}
+          {memberType === "student" && (
+            <Select
+              label="الفرقة"
+              options={academicYearOptions}
+              placeholder="اختر الفرقة"
+              error={errors.academicYear?.message}
+              required
+              {...register("academicYear")}
+            />
+          )}
 
-      {/* Profile Photo */}
-      <FileUpload
-        label="الصورة الشخصية"
-        required
-        error={imageError || undefined}
-        onChange={setProfileImage}
-      />
+          {/* الدراسات العليا */}
+          <RadioGroup
+            label="الدراسات العليا"
+            options={postgraduateOptions}
+            value={watch("postgraduateStudy")}
+            onValueChange={(value) => setValue("postgraduateStudy", value as "none" | "preliminary" | "masters" | "doctorate")}
+            error={errors.postgraduateStudy?.message}
+          />
+        </div>
+      </div>
 
-      {/* Payment Method */}
-      <RadioGroup
-        label="طريقة سداد الرسوم"
-        options={paymentOptions}
-        value={paymentMethod}
-        onValueChange={(value) => setValue("paymentMethod", value as "coordinator" | "instapay")}
-        error={errors.paymentMethod?.message}
-        required
-      />
+      {/* ============ الحالة الوظيفية ============ */}
+      <div>
+        <h3 className="text-base sm:text-lg font-bold text-[#1e3a5f] mb-3 pb-2 border-b-2 border-[#1e3a5f]/20">
+          الحالة الوظيفية
+        </h3>
 
-      {/* Conditional Fields */}
-      {paymentMethod === "coordinator" && (
-        <Input
-          label="اسم منسق المحافظة"
-          placeholder="أدخل اسم المنسق"
-          error={errors.coordinatorName?.message}
-          required
-          {...register("coordinatorName")}
-        />
-      )}
+        <div className="space-y-4">
+          <RadioGroup
+            label=""
+            options={employmentOptions}
+            value={employmentStatus}
+            onValueChange={(value) => setValue("employmentStatus", value as "working" | "not_working")}
+            error={errors.employmentStatus?.message}
+          />
 
-      {paymentMethod === "instapay" && (
-        <Input
-          label="الرقم المرجعي Instapay"
-          placeholder="أدخل الرقم المرجعي"
-          error={errors.instapayRef?.message}
-          required
-          {...register("instapayRef")}
-        />
-      )}
+          {employmentStatus === "working" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="المسمى الوظيفي"
+                placeholder="مثال: مهندس برمجيات"
+                error={errors.jobTitle?.message}
+                required
+                {...register("jobTitle")}
+              />
+              <Input
+                label="جهة العمل"
+                placeholder="مثال: شركة ..."
+                error={errors.employer?.message}
+                required
+                {...register("employer")}
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
-      {/* Amount Paid */}
-      <Input
-        label="المبلغ المدفوع"
-        placeholder="أدخل المبلغ المدفوع"
-        type="number"
-        error={errors.amountPaid?.message}
-        required
-        dir="ltr"
-        className="text-left"
-        {...register("amountPaid")}
-      />
+      {/* ============ الخبرات والمهارات ============ */}
+      <div>
+        <h3 className="text-base sm:text-lg font-bold text-[#1e3a5f] mb-3 pb-2 border-b-2 border-[#1e3a5f]/20">
+          الخبرات والمهارات
+        </h3>
 
-      {/* Payment Receipt */}
-      <FileUpload
-        label="صورة إيصال الدفع"
-        required
-        error={receiptError || undefined}
-        onChange={setPaymentReceipt}
-      />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <TagInput label="الخبرات السابقة" placeholder="اكتب واضغط Enter..." tags={experienceTags} onChange={setExperienceTags} />
+          <TagInput label="المهارات" placeholder="اكتب واضغط Enter..." tags={skillTags} onChange={setSkillTags} />
+        </div>
+      </div>
 
-      {/* Membership Fees Info */}
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-        <p className="text-blue-900">
-          لسداد رسوم العضوية يتم السداد على رقم الحساب التالي:
-        </p>
-        <p className="font-mono font-bold text-blue-900 text-lg mt-1" dir="ltr">
-          {paymentInfo.accountNumber}
-        </p>
+      {/* الإقرار */}
+      <div className="p-4 bg-[#1e3a5f]/5 border border-[#1e3a5f]/20 rounded-lg text-sm text-gray-700 text-center leading-relaxed">
+        أقرّ أنا الموقع أدناه بصحة كافة البيانات الواردة في استمارة العضوية، وأتعهد بالالتزام بجميع القوانين واللوائح المنظمة لعمل اتحاد بشبابها.
       </div>
 
       {/* Submit Button */}

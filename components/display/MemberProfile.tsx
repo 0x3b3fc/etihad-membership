@@ -18,13 +18,15 @@ interface MemberData {
 
 interface MemberProfileProps {
   member: MemberData;
+  applicationStatus?: "PENDING" | "ACCEPTED" | "REJECTED" | null;
 }
 
 function getMemberTypeLabel(type: string): string {
   return type === "student" ? "طالب" : "خريج";
 }
 
-export default function MemberProfile({ member }: MemberProfileProps) {
+export default function MemberProfile({ member, applicationStatus }: MemberProfileProps) {
+  const isVerified = applicationStatus === "ACCEPTED";
   return (
     <div className="max-w-md mx-auto">
       {/* Card */}
@@ -35,9 +37,19 @@ export default function MemberProfile({ member }: MemberProfileProps) {
           <div className="absolute top-3 right-3 px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full">
             <span className="text-white text-xs font-medium" dir="ltr">{member.memberNumber}</span>
           </div>
-          {/* Verified Badge */}
-          <div className="absolute top-3 left-3 px-2.5 py-1 bg-green-500/90 backdrop-blur-sm rounded-full">
-            <span className="text-white text-xs font-medium">عضو موثق</span>
+          {/* Status Badge */}
+          <div className={`absolute top-3 left-3 px-2.5 py-1 backdrop-blur-sm rounded-full ${
+            isVerified ? 'bg-green-500/90' :
+            applicationStatus === 'PENDING' ? 'bg-yellow-500/90' :
+            applicationStatus === 'REJECTED' ? 'bg-red-500/90' :
+            'bg-gray-500/90'
+          }`}>
+            <span className="text-white text-xs font-medium">
+              {isVerified ? 'عضو موثق' :
+               applicationStatus === 'PENDING' ? 'قيد المراجعة' :
+               applicationStatus === 'REJECTED' ? 'مرفوض' :
+               'غير مقدم'}
+            </span>
           </div>
         </div>
 
@@ -55,11 +67,13 @@ export default function MemberProfile({ member }: MemberProfileProps) {
               />
             </div>
             {/* Verified Badge */}
-            <div className="absolute -bottom-1 -left-1 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-md ring-2 ring-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
+            {isVerified && (
+              <div className="absolute -bottom-1 -left-1 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-md ring-2 ring-white">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+            )}
           </div>
 
           {/* Name */}
@@ -144,10 +158,30 @@ export default function MemberProfile({ member }: MemberProfileProps) {
           )}
 
           {/* Member Status */}
-          <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+          <div className={`rounded-lg p-3 border ${
+            isVerified ? 'bg-green-50 border-green-200' :
+            applicationStatus === 'PENDING' ? 'bg-yellow-50 border-yellow-200' :
+            applicationStatus === 'REJECTED' ? 'bg-red-50 border-red-200' :
+            'bg-gray-50 border-gray-200'
+          }`}>
             <div className="flex items-center justify-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-green-700 font-medium text-sm">عضو نشط ومسجل</span>
+              <div className={`w-2 h-2 rounded-full ${
+                isVerified ? 'bg-green-500' :
+                applicationStatus === 'PENDING' ? 'bg-yellow-500' :
+                applicationStatus === 'REJECTED' ? 'bg-red-500' :
+                'bg-gray-500'
+              }`}></div>
+              <span className={`font-medium text-sm ${
+                isVerified ? 'text-green-700' :
+                applicationStatus === 'PENDING' ? 'text-yellow-700' :
+                applicationStatus === 'REJECTED' ? 'text-red-700' :
+                'text-gray-700'
+              }`}>
+                {isVerified ? 'عضو نشط ومسجل' :
+                 applicationStatus === 'PENDING' ? 'في انتظار الموافقة' :
+                 applicationStatus === 'REJECTED' ? 'تم رفض الطلب' :
+                 'لم يتم تقديم طلب'}
+              </span>
             </div>
           </div>
         </div>

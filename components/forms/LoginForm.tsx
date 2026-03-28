@@ -19,19 +19,20 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn("admin-credentials", {
         email,
         password,
         redirect: false,
+        callbackUrl: "/admin/members",
       });
 
       if (result?.error) {
-        setError(result.error);
+        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
       } else {
-        router.push("/admin/members");
-        router.refresh();
+        window.location.href = "/admin/members";
       }
-    } catch {
+    } catch (err) {
+      console.error("Login error:", err);
       setError("حدث خطأ أثناء تسجيل الدخول");
     } finally {
       setIsLoading(false);

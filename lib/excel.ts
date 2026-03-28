@@ -10,11 +10,7 @@ interface ExcelMember {
   "نوع العضو": string;
   "الوحدة/اللجنة": string;
   "الصفة": string;
-  "طريقة الدفع": string;
-  "اسم المنسق": string;
-  "رقم Instapay": string;
   "رابط الصورة": string;
-  "رابط إيصال الدفع": string;
   "رابط QR": string;
   "تاريخ التسجيل": string;
 }
@@ -29,11 +25,7 @@ export function generateExcel(members: Member[]): Buffer {
     "نوع العضو": member.memberType === "student" ? "طالب" : "خريج",
     "الوحدة/اللجنة": member.entityName,
     "الصفة": member.role,
-    "طريقة الدفع": member.paymentMethod === "coordinator" ? "منسق المحافظة" : "Instapay",
-    "اسم المنسق": member.coordinatorName || "-",
-    "رقم Instapay": member.instapayRef || "-",
     "رابط الصورة": member.profileImage,
-    "رابط إيصال الدفع": member.paymentReceipt || "-",
     "رابط QR": member.qrCode,
     "تاريخ التسجيل": new Date(member.createdAt).toLocaleDateString("ar-EG", {
       year: "numeric",
@@ -52,11 +44,7 @@ export function generateExcel(members: Member[]): Buffer {
       "نوع العضو",
       "الوحدة/اللجنة",
       "الصفة",
-      "طريقة الدفع",
-      "اسم المنسق",
-      "رقم Instapay",
       "رابط الصورة",
-      "رابط إيصال الدفع",
       "رابط QR",
       "تاريخ التسجيل",
     ],
@@ -75,11 +63,7 @@ export function generateExcel(members: Member[]): Buffer {
     { wch: 10 }, // نوع العضو
     { wch: 35 }, // الوحدة/اللجنة
     { wch: 20 }, // الصفة
-    { wch: 15 }, // طريقة الدفع
-    { wch: 20 }, // اسم المنسق
-    { wch: 20 }, // رقم Instapay
     { wch: 50 }, // رابط الصورة
-    { wch: 50 }, // رابط إيصال الدفع
     { wch: 50 }, // رابط QR
     { wch: 20 }, // تاريخ التسجيل
   ];

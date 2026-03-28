@@ -14,19 +14,15 @@ function generatePassword(): string {
 async function generateMemberNumber(governorate: string): Promise<string> {
   const prefix = getGovernorateCode(governorate);
 
-  // Get governorate index to calculate base number
-  // Each governorate has a reserved range of 5000 numbers
   const governorateIndex = governorates.indexOf(governorate as Governorate);
-  const baseNumber = governorateIndex * 5000; // القاهرة=0, الجيزة=5000, الإسكندرية=10000, etc.
+  const baseNumber = governorateIndex * 5000;
 
-  // Get or create counter for this prefix
   const counter = await prisma.memberCounter.upsert({
     where: { prefix },
     update: { counter: { increment: 1 } },
-    create: { id: prefix, prefix, counter: baseNumber + 1 }, // يبدأ من baseNumber + 1
+    create: { id: prefix, prefix, counter: baseNumber + 1 },
   });
 
-  // Format: XX-XXXXX (e.g., CA-00001, GZ-05001, AX-10001)
   const number = counter.counter.toString().padStart(5, "0");
   return `${prefix}-${number}`;
 }
@@ -35,33 +31,52 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
 
+    // البيانات الأساسية
     const nationalId = formData.get("nationalId") as string;
     const fullNameAr = formData.get("fullNameAr") as string;
-    const fullNameEn = formData.get("fullNameEn") as string;
     const governorate = formData.get("governorate") as string;
+    const address = formData.get("address") as string;
+    const phone1 = formData.get("phone1") as string;
+    const phone2 = formData.get("phone2") as string | null;
+    const email = formData.get("email") as string | null;
+
+    // المؤهلات التعليمية
     const memberType = formData.get("memberType") as string;
-    const entityName = formData.get("entityName") as string;
-    const role = formData.get("role") as string;
-    const paymentMethod = formData.get("paymentMethod") as string;
-    const coordinatorName = formData.get("coordinatorName") as string | null;
-    const instapayRef = formData.get("instapayRef") as string | null;
-    const amountPaid = formData.get("amountPaid") as string;
+    const universityName = formData.get("universityName") as string;
+    const facultyName = formData.get("facultyName") as string;
+    const academicYear = formData.get("academicYear") as string | null;
+    const postgraduateStudy = formData.get("postgraduateStudy") as string;
+
+    // الحالة الوظيفية
+    const employmentStatus = formData.get("employmentStatus") as string;
+    const jobTitle = formData.get("jobTitle") as string | null;
+    const employer = formData.get("employer") as string | null;
+
+    // الخبرات والمهارات
+    const previousExperiences = formData.get("previousExperiences") as string | null;
+    const skills = formData.get("skills") as string | null;
+
     const profileImageFile = formData.get("profileImage") as File | null;
-    const paymentReceiptFile = formData.get("paymentReceipt") as File | null;
 
     // Validate form data
     const validationResult = memberSchema.safeParse({
       nationalId,
       fullNameAr,
-      fullNameEn,
       governorate,
+      address,
+      phone1,
+      phone2: phone2 || "",
+      email: email || "",
       memberType,
-      entityName,
-      role,
-      paymentMethod,
-      coordinatorName: coordinatorName || undefined,
-      instapayRef: instapayRef || undefined,
-      amountPaid,
+      universityName,
+      facultyName,
+      academicYear: academicYear || "",
+      postgraduateStudy: postgraduateStudy || "none",
+      employmentStatus: employmentStatus || "not_working",
+      jobTitle: jobTitle || "",
+      employer: employer || "",
+      previousExperiences: previousExperiences || "",
+      skills: skills || "",
     });
 
     if (!validationResult.success) {
@@ -111,30 +126,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate payment receipt
-    if (!paymentReceiptFile) {
-      return NextResponse.json(
-        { success: false, errors: [{ field: "paymentReceipt", message: "صورة إيصال الدفع مطلوبة" }] },
-        { status: 400 }
-      );
-    }
-
-    const receiptValidation = imageSchema.safeParse({
-      size: paymentReceiptFile.size,
-      type: paymentReceiptFile.type,
-    });
-
-    if (!receiptValidation.success) {
-      const errors = receiptValidation.error.issues.map((e) => ({
-        field: "paymentReceipt",
-        message: e.message,
-      }));
-      return NextResponse.json(
-        { success: false, errors },
-        { status: 400 }
-      );
-    }
-
     // Convert profile image to base64 and upload
     const bytes = await profileImageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -150,47 +141,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert payment receipt to base64 and upload
-    const receiptBytes = await paymentReceiptFile.arrayBuffer();
-    const receiptBuffer = Buffer.from(receiptBytes);
-    const base64Receipt = `data:${paymentReceiptFile.type};base64,${receiptBuffer.toString("base64")}`;
-
-    let paymentReceiptUrl: string;
-    try {
-      paymentReceiptUrl = await uploadImage(base64Receipt);
-    } catch {
-      return NextResponse.json(
-        { success: false, errors: [{ field: "paymentReceipt", message: "فشل في رفع صورة الإيصال، يرجى المحاولة مرة أخرى" }] },
-        { status: 500 }
-      );
-    }
+    const d = validationResult.data;
 
     // Generate member number
-    const memberNumber = await generateMemberNumber(validationResult.data.governorate);
+    const memberNumber = await generateMemberNumber(d.governorate);
 
     // Generate random password
     const plainPassword = generatePassword();
     const hashedPassword = await bcrypt.hash(plainPassword, 12);
 
-    // Create member with temporary QR code
+    // Build education string and entity name from new fields
+    const educationStr = `${d.universityName} - ${d.facultyName}`;
+    const fullNameEn = d.fullNameAr; // Use Arabic name as placeholder for English name
+
+    // Create member
     const member = await prisma.member.create({
       data: {
         memberNumber,
-        nationalId: validationResult.data.nationalId,
+        nationalId: d.nationalId,
         password: hashedPassword,
-        fullNameAr: validationResult.data.fullNameAr,
-        fullNameEn: validationResult.data.fullNameEn,
-        governorate: validationResult.data.governorate,
-        memberType: validationResult.data.memberType,
-        entityName: validationResult.data.entityName,
-        role: validationResult.data.role,
+        fullNameAr: d.fullNameAr,
+        fullNameEn,
+        governorate: d.governorate,
+        memberType: d.memberType as "student" | "graduate",
+        entityName: educationStr,
+        role: d.employmentStatus === "working" ? (d.jobTitle || "عضو") : "عضو",
         profileImage: profileImageUrl,
-        paymentMethod: validationResult.data.paymentMethod,
-        coordinatorName: validationResult.data.coordinatorName || null,
-        instapayRef: validationResult.data.instapayRef || null,
-        amountPaid: parseFloat(validationResult.data.amountPaid),
-        paymentReceipt: paymentReceiptUrl,
-        qrCode: "", // Will be updated after creation
+        qrCode: "",
       },
     });
 

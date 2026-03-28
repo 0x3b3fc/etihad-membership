@@ -6,6 +6,10 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================
+// Existing etihad-membership models
+// ============================================
+
 model Member {
   id              String        @id @default(uuid())
   memberNumber    String        @unique
@@ -17,22 +21,32 @@ model Member {
   memberType      MemberType
   entityName      String
   role            String
-  profileImage    String
-  paymentMethod   PaymentMethod
-  coordinatorName String?
-  instapayRef     String?
-  amountPaid      Float?
-  paymentReceipt  String?
+  address              String?
+  phone1               String?
+  phone2               String?
+  email                String?
+  academicYear         String?
+  postgraduateStudy    String?   @default("none")
+  employmentStatus     String?   @default("not_working")
+  jobTitle             String?
+  employer             String?
+  previousExperiences  String?
+  skills               String?
+  profileImage         String
   qrCode          String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  governorateId   String?
+  governorateRef  Governorate?  @relation(fields: [governorateId], references: [id])
+  Attendance      Attendance[]
+  application     Application?
 }
 
 // Counter for generating sequential member numbers per governorate
 model MemberCounter {
-  id        String @id
-  prefix    String @unique
-  counter   Int    @default(5000)
+  id      String @id
+  prefix  String @unique
+  counter Int    @default(5000)
 }
 
 enum MemberType {
@@ -41,27 +55,191 @@ enum MemberType {
 }
 
 model Admin {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String   @default("مدير النظام")
-  createdAt DateTime @default(now())
-}
-
-enum PaymentMethod {
-  coordinator
-  instapay
+  id         String       @id @default(uuid())
+  email      String       @unique
+  password   String
+  name       String       @default("مدير النظام")
+  createdAt  DateTime     @default(now())
+  Attendance Attendance[]
+  Event      Event[]
 }
 
 model Settings {
-  id               String   @id @default("default")
-  platformName     String   @default("عضويتي")
-  platformSubtitle String   @default("اتحاد بشبابها")
-  logoUrl          String?
-  primaryColor     String   @default("#1e3a5f")
-  membershipFee    Float    @default(0)
-  instapayNumber   String?
-  instapayName     String?
-  enableRegistration Boolean @default(true)
-  updatedAt        DateTime @updatedAt
+  id                 String   @id @default("default")
+  platformName       String   @default("عضويتي")
+  platformSubtitle   String   @default("اتحاد بشبابها")
+  logoUrl            String?
+  primaryColor       String   @default("#1e3a5f")
+  membershipFee      Float    @default(0)
+  instapayNumber     String?
+  instapayName       String?
+  enableRegistration Boolean  @default(true)
+  enableApplications Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
+}
+
+model PdfTemplate {
+  id        String   @id @default("default")
+  name      String   @default("القالب الافتراضي")
+  fields    Json
+  updatedAt DateTime @updatedAt
+
+  @@map("pdf_templates")
+}
+
+// ============================================
+// Event & Attendance (synced from live DB)
+// ============================================
+
+enum EventCategory {
+  workshop
+  conference
+  meeting
+  training
+  seminar
+  celebration
+  sports
+  cultural
+  other
+}
+
+model Event {
+  id               String        @id
+  name             String
+  description      String?
+  category         EventCategory
+  organizingEntity String
+  location         String
+  date             DateTime
+  startTime        String
+  endTime          String?
+  isActive         Boolean       @default(true)
+  createdBy        String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  Admin            Admin         @relation(fields: [createdBy], references: [id])
+  Attendance       Attendance[]
+}
+
+model Attendance {
+  id        String   @id
+  eventId   String
+  memberId  String
+  scannedBy String
+  scannedAt DateTime @default(now())
+  Event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  Member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  Admin     Admin    @relation(fields: [scannedBy], references: [id])
+
+  @@unique([eventId, memberId])
+}
+
+// ============================================
+// New models from rabt
+// ============================================
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  password    String
+  name        String?
+  phone       String?
+  role        Role         @default(USER)
+  unitId      String?
+  unit        Unit?        @relation(fields: [unitId], references: [id])
+  application Application?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("users")
+}
+
+model Governorate {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  code         String        @unique
+  isActive     Boolean       @default(true)
+  units        Unit[]
+  applications Application[]
+  members      Member[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("governorates")
+}
+
+model Unit {
+  id            String        @id @default(cuid())
+  governorateId String?
+  governorate   Governorate?  @relation(fields: [governorateId], references: [id], onDelete: SetNull)
+  name          String        @unique
+  whatsappLink  String?
+  address       String?
+  phone         String?
+  isActive      Boolean       @default(true)
+  users         User[]
+  applications  Application[] @relation("AssignedUnit")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("units")
+}
+
+model Application {
+  id                     String            @id @default(cuid())
+  userId                 String?           @unique
+  user                   User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  memberId               String?           @unique
+  member                 Member?           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  governorateId          String
+  governorate            Governorate       @relation(fields: [governorateId], references: [id])
+  fullName               String
+  nationalId             String            @unique
+  phone                  String?
+  phone2                 String?
+  email                  String?
+  birthDate              DateTime
+  address                String
+  // Educational qualifications
+  memberType             String            @default("student") // student or graduate
+  universityName         String?
+  facultyName            String?
+  academicYear           String?
+  postgraduateStudy      String?           // none, preliminary, masters, doctorate
+  // Employment status
+  employmentStatus       String            @default("not_working") // working or not_working
+  jobTitle               String?
+  employer               String?
+  // Experience & Skills
+  previousExperiences    String?
+  skills                 String?
+  // Photos
+  photoUrl               String?
+  nationalIdPhotoUrl     String?
+  nationalIdPhotoBackUrl String?
+  // Legacy fields kept for backwards compatibility
+  education              String?
+  experiences            String[]
+  // Workflow
+  status                 ApplicationStatus @default(PENDING)
+  assignedUnitId         String?
+  assignedUnit           Unit?             @relation("AssignedUnit", fields: [assignedUnitId], references: [id])
+  adminNote              String?
+  submittedAt            DateTime          @default(now())
+  decidedAt              DateTime?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  @@map("applications")
 }

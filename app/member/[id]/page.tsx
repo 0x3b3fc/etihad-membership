@@ -36,6 +36,11 @@ export default async function MemberPage({ params }: MemberPageProps) {
     notFound();
   }
 
+  const application = await prisma.application.findUnique({
+    where: { memberId: id },
+    select: { status: true },
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header showAdminLink={false} />
@@ -58,6 +63,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
             ...member,
             createdAt: member.createdAt.toISOString(),
           }}
+          applicationStatus={application?.status as "PENDING" | "ACCEPTED" | "REJECTED" | undefined ?? null}
         />
       </main>
 
