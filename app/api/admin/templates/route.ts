@@ -37,8 +37,13 @@ export const DEFAULT_TEMPLATE_FIELDS = {
   university:      { xRight: 505, yTop: 358, size: 10, type: "rtl", label: "الجامعة" },
   faculty:         { xRight: 505, yTop: 382, size: 10, type: "rtl", label: "الكلية" },
   year:            { xRight: 505, yTop: 406, size: 10, type: "rtl", label: "السنة الدراسية" },
+  postgraduateStudy: { xRight: 505, yTop: 430, size: 9, type: "rtl", label: "الدراسات العليا" },
   employedCheck:   { x: 295, yTop: 478, type: "check", label: "يعمل ✓" },
   unemployedCheck: { x: 97,  yTop: 478, type: "check", label: "لا يعمل ✓" },
+  jobTitle:        { xRight: 505, yTop: 502, size: 9, type: "rtl", label: "المسمى الوظيفي" },
+  employer:        { xRight: 505, yTop: 526, size: 9, type: "rtl", label: "جهة العمل" },
+  previousExperiences: { xRight: 505, yTop: 568, size: 8, type: "rtl", label: "الخبرات السابقة" },
+  skills:          { xRight: 505, yTop: 592, size: 8, type: "rtl", label: "المهارات" },
   profileImage:    { x: 37, yTop: 176, width: 104, height: 105, type: "image", label: "الصورة الشخصية" },
 };
 
@@ -64,7 +69,10 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ success: true, data: template });
+    // Merge: saved fields override defaults, but new default fields are included
+    const mergedFields = { ...DEFAULT_TEMPLATE_FIELDS, ...(template.fields as Record<string, unknown>) };
+
+    return NextResponse.json({ success: true, data: { ...template, fields: mergedFields } });
   } catch (error) {
     console.error("Template GET error:", error);
     return NextResponse.json(

@@ -60,6 +60,6 @@ export async function validateLogin(data: LoginInput) {
 
   return {
     success: true,
-    redirectTo: user.role === "ADMIN" ? "/admin/dashboard" : "/dashboard",
+    redirectTo: user.role === "ADMIN" ? "/admin" : "/dashboard",
   };
 }

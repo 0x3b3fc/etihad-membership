@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex flex-col items-center">
             <Image
-              src="https://res.cloudinary.com/det1gfcko/image/upload/v1768060031/d5df2f10-7e43-4d9f-8509-4ec203636719-copied-media_2_ssq0wg.png"
+              src="/logo.png"
               alt="عضويتي"
               width={80}
               height={80}

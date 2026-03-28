@@ -62,8 +62,6 @@ export default function RegistrationForm() {
       email: "",
       jobTitle: "",
       employer: "",
-      previousExperiences: undefined,
-      skills: undefined,
     },
   });
 

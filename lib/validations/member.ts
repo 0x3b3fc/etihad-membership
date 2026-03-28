@@ -64,9 +64,6 @@ export const baseMemberSchema = z.object({
   jobTitle: z.string().optional().or(z.literal("")),
   employer: z.string().optional().or(z.literal("")),
 
-  // الخبرات والمهارات
-  previousExperiences: z.string().optional().or(z.literal("")),
-  skills: z.string().optional().or(z.literal("")),
 });
 
 export type MemberFormData = z.infer<typeof baseMemberSchema>;

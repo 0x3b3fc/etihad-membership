@@ -48,8 +48,13 @@ const DEFAULT_FIELDS = {
   university:     { xRight: 505, yTop: 358, size: 10 },
   faculty:        { xRight: 505, yTop: 382, size: 10 },
   year:           { xRight: 505, yTop: 406, size: 10 },
+  postgraduateStudy: { xRight: 505, yTop: 430, size: 9 },
   employedCheck:  { x: 295, yTop: 478 },
   unemployedCheck:{ x: 97,  yTop: 478 },
+  jobTitle:       { xRight: 505, yTop: 502, size: 9 },
+  employer:       { xRight: 505, yTop: 526, size: 9 },
+  previousExperiences: { xRight: 505, yTop: 568, size: 8 },
+  skills:         { xRight: 505, yTop: 592, size: 8 },
   profileImage:   { x: 37, yTop: 176, width: 104, height: 105 },
 };
 
@@ -96,13 +101,14 @@ class PDFWriter {
     });
   }
 
-  /** Draw a checkmark */
+  /** Draw a checkmark as a filled square */
   drawCheck(x: number, yTop: number) {
-    this.page.drawText("✓", {
-      x,
-      y: this.toY(yTop),
-      size: 12,
-      font: this.font,
+    const size = 8;
+    this.page.drawRectangle({
+      x: x,
+      y: this.toY(yTop) - size / 2,
+      width: size,
+      height: size,
       color: this.color,
     });
   }
@@ -162,8 +168,9 @@ export async function GET(
     const savedTemplate = await prisma.pdfTemplate.findUnique({
       where: { id: "default" },
     });
+    // Merge: saved template overrides defaults, but new default fields are included
     const FIELDS: FieldMap = savedTemplate
-      ? (savedTemplate.fields as FieldMap)
+      ? { ...DEFAULT_FIELDS, ...(savedTemplate.fields as FieldMap) }
       : DEFAULT_FIELDS;
 
     const templatePath = path.join(process.cwd(), "public", "membership-form-template.pdf");
@@ -189,16 +196,15 @@ export async function GET(
     // ── البيانات الأساسية ──
 
     const gov = FIELDS.governorate;
-    w.drawRTL(member.governorate, gov.xRight, gov.yTop, gov.size);
+    if (gov) w.drawRTL(member.governorate, gov.xRight, gov.yTop, gov.size);
 
     const name = FIELDS.fullNameAr;
-    w.drawRTL(member.fullNameAr, name.xRight, name.yTop, name.size);
+    if (name) w.drawRTL(member.fullNameAr, name.xRight, name.yTop, name.size);
 
     // الرقم القومي — 14 individually positioned boxes (or legacy single field)
     if (member.nationalId) {
       const nid = member.nationalId;
       if (FIELDS.nid_1) {
-        // New format: 14 individual boxes
         for (let i = 0; i < Math.min(nid.length, 14); i++) {
           const box = FIELDS[`nid_${i + 1}`];
           if (box) {
@@ -208,7 +214,6 @@ export async function GET(
           }
         }
       } else if (FIELDS.nationalId) {
-        // Legacy format: single field with startCenterX + boxWidth
         const f = FIELDS.nationalId;
         for (let i = 0; i < Math.min(nid.length, 14); i++) {
           w.drawCentered(nid[i], f.startCenterX - i * f.boxWidth, f.yTop, f.size || 9);
@@ -216,23 +221,86 @@ export async function GET(
       }
     }
 
+    // العنوان
+    if (FIELDS.address && member.address) {
+      const addr = FIELDS.address;
+      w.drawRTL(member.address, addr.xRight, addr.yTop, addr.size);
+    }
+
+    // الموبايل
+    if (FIELDS.phone1 && member.phone1) {
+      const p1 = FIELDS.phone1;
+      w.drawRTL(member.phone1, p1.xRight, p1.yTop, p1.size);
+    }
+    if (FIELDS.phone2 && member.phone2) {
+      const p2 = FIELDS.phone2;
+      w.drawRTL(member.phone2, p2.xRight, p2.yTop, p2.size);
+    }
+
+    // البريد الالكتروني
+    if (FIELDS.email && member.email) {
+      const em = FIELDS.email;
+      w.drawRTL(member.email, em.xRight, em.yTop, em.size);
+    }
+
     // ── المؤهلات التعليمية ──
 
     if (member.memberType === "student") {
-      w.drawCheck(FIELDS.studentCheck.x, FIELDS.studentCheck.yTop);
+      if (FIELDS.studentCheck) w.drawCheck(FIELDS.studentCheck.x, FIELDS.studentCheck.yTop);
     } else if (member.memberType === "graduate") {
-      w.drawCheck(FIELDS.graduateCheck.x, FIELDS.graduateCheck.yTop);
+      if (FIELDS.graduateCheck) w.drawCheck(FIELDS.graduateCheck.x, FIELDS.graduateCheck.yTop);
     }
 
     const univ = FIELDS.university;
-    w.drawRTL(universityName, univ.xRight, univ.yTop, univ.size);
+    if (univ) w.drawRTL(universityName, univ.xRight, univ.yTop, univ.size);
 
     const fac = FIELDS.faculty;
-    w.drawRTL(facultyName, fac.xRight, fac.yTop, fac.size);
+    if (fac) w.drawRTL(facultyName, fac.xRight, fac.yTop, fac.size);
+
+    // الفرقة
+    if (FIELDS.year && member.academicYear) {
+      const yr = FIELDS.year;
+      w.drawRTL(member.academicYear, yr.xRight, yr.yTop, yr.size);
+    }
+
+    // الدراسات العليا
+    if (FIELDS.postgraduateStudy && member.postgraduateStudy && member.postgraduateStudy !== "none") {
+      const pg = FIELDS.postgraduateStudy;
+      const pgLabels: Record<string, string> = { preliminary: "تمهيدي", masters: "ماجستير", doctorate: "دكتوراه" };
+      w.drawRTL(pgLabels[member.postgraduateStudy] || member.postgraduateStudy, pg.xRight, pg.yTop, pg.size);
+    }
 
     // ── الحالة الوظيفية ──
 
-    w.drawCheck(FIELDS.unemployedCheck.x, FIELDS.unemployedCheck.yTop);
+    if (member.employmentStatus === "working") {
+      if (FIELDS.employedCheck) w.drawCheck(FIELDS.employedCheck.x, FIELDS.employedCheck.yTop);
+    } else {
+      if (FIELDS.unemployedCheck) w.drawCheck(FIELDS.unemployedCheck.x, FIELDS.unemployedCheck.yTop);
+    }
+
+    // المسمى الوظيفي
+    if (FIELDS.jobTitle && member.jobTitle) {
+      const jt = FIELDS.jobTitle;
+      w.drawRTL(member.jobTitle, jt.xRight, jt.yTop, jt.size);
+    }
+
+    // جهة العمل
+    if (FIELDS.employer && member.employer) {
+      const emp = FIELDS.employer;
+      w.drawRTL(member.employer, emp.xRight, emp.yTop, emp.size);
+    }
+
+    // الخبرات السابقة
+    if (FIELDS.previousExperiences && member.previousExperiences) {
+      const pe = FIELDS.previousExperiences;
+      w.drawRTL(member.previousExperiences, pe.xRight, pe.yTop, pe.size);
+    }
+
+    // المهارات
+    if (FIELDS.skills && member.skills) {
+      const sk = FIELDS.skills;
+      w.drawRTL(member.skills, sk.xRight, sk.yTop, sk.size);
+    }
 
     // ── الصورة الشخصية ──
 
