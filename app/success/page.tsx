@@ -16,7 +16,7 @@ export default async function SuccessPage({
         <div className="container mx-auto flex h-14 sm:h-16 items-center px-4">
           <Link href="/" className="flex items-center gap-2 sm:gap-3">
             <Image
-              src="https://res.cloudinary.com/det1gfcko/image/upload/v1768060031/d5df2f10-7e43-4d9f-8509-4ec203636719-copied-media_2_ssq0wg.png"
+              src="/logo.png"
               alt="عضويتي"
               width={40}
               height={40}
