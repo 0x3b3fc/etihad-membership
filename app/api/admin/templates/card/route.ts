@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // Card template: 647 × 409 px
-export const DEFAULT_CARD_FIELDS = {
+const DEFAULT_CARD_FIELDS = {
   fullNameAr:    { x: 340, yTop: 120, size: 14, type: "text", label: "الاسم" },
   memberNumber:  { x: 340, yTop: 160, size: 12, type: "text", label: "رقم العضوية" },
   governorate:   { x: 340, yTop: 200, size: 12, type: "text", label: "المحافظة" },

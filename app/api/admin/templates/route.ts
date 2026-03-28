@@ -24,7 +24,7 @@ function generateNidDefaults() {
   return fields;
 }
 
-export const DEFAULT_TEMPLATE_FIELDS = {
+const DEFAULT_TEMPLATE_FIELDS = {
   governorate:     { xRight: 415, yTop: 172, size: 9, type: "rtl", label: "المحافظة" },
   fullNameAr:      { xRight: 510, yTop: 196, size: 10, type: "rtl", label: "الاسم بالعربي" },
   ...generateNidDefaults(),
