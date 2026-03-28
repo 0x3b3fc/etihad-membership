@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { getGovernorates } from '@/lib/actions/governorate.actions'
 import { GovernorateActions } from '@/components/forms/GovernorateActions'
 import { AddGovernorateButton } from './AddGovernorateButton'

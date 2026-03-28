@@ -1,3 +1,5 @@
+export const revalidate = 30;
+
 import { getApplications } from '@/lib/actions/application.actions'
 import { getGovernorates } from '@/lib/actions/governorate.actions'
 import Link from 'next/link'

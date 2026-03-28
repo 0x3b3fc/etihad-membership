@@ -64,6 +64,7 @@ export default function MemberProfile({ member, applicationStatus }: MemberProfi
                 width={96}
                 height={96}
                 className="w-full h-full rounded-full object-cover"
+                priority
               />
             </div>
             {/* Verified Badge */}

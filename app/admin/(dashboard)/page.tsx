@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
+export const revalidate = 30; // revalidate every 30 seconds
+
 export default async function AdminDashboardPage() {
   const [
     totalMembers,

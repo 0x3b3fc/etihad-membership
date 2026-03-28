@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { getUnits } from '@/lib/actions/unit.actions'
 import { getGovernorates } from '@/lib/actions/governorate.actions'
 import { UnitActions } from '@/components/forms/UnitActions'

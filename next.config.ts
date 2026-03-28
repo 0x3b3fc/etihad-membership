@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ["xlsx", "cloudinary"],
+    optimizePackageImports: ["xlsx", "cloudinary", "lucide-react", "date-fns"],
   },
 
   // Headers for caching
